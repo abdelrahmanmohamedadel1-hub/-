@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0E2024">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wassaf">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
+<title>وصّاف · Wassaf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E2024; --bg2:#0A1719; --surface:#173033; --card:#1C3A3E; --line:#2C4E52;
+  --ink:#EAF5F3; --ink-dim:#8FB3B0;
+  --accent:#FF4D8D; --accent-soft:#FF7BAA;
+  --gold:#FFC857;
+  --success:#4ADE80; --danger:#F87171;
+  --font-d:'Cairo',sans-serif; --font-b:'Tajawal',sans-serif; --font-lat:'Poppins',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);}
+html[lang="en"] body,html[lang="fr"] body,html[lang="es"] body{font-family:var(--font-lat);}
+h1,h2,h3{font-family:var(--font-d);}
+html[lang="en"] h1,html[lang="en"] h2,html[lang="en"] h3,
+html[lang="fr"] h1,html[lang="fr"] h2,html[lang="fr"] h3,
+html[lang="es"] h1,html[lang="es"] h2,html[lang="es"] h3{font-family:var(--font-lat);font-weight:800;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+
+.topbar{padding:16px 18px;background:linear-gradient(180deg,#173538,var(--bg));border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(155deg,var(--accent-soft),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.brand-name{font-weight:800;font-size:18px;}
+.langbox select{
+  background:var(--surface);border:1px solid var(--line);color:var(--ink);
+  border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:700;
+}
+
+.hero{padding:34px 20px 26px;text-align:center;background:radial-gradient(120% 100% at 50% 0%, #1E4448 0%, var(--bg) 70%);}
+.hero h1{margin:0 0 8px;font-size:26px;font-weight:800;line-height:1.35;}
+.hero h1 span{color:var(--accent-soft);}
+.hero p{margin:0 auto;max-width:420px;font-size:14px;color:var(--ink-dim);line-height:1.7;}
+.feature-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+.feature-chip{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--ink-dim);display:flex;align-items:center;gap:6px;}
+
+.wrap{max-width:600px;margin:0 auto;padding:0 16px 50px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:-8px;margin-bottom:16px;position:relative;}
+.section-title{font-size:14px;color:var(--accent-soft);font-weight:700;margin:2px 0 12px;display:flex;align-items:center;gap:6px;}
+label{display:block;font-size:12px;color:var(--ink-dim);margin:11px 0 5px;font-weight:700;}
+input[type=text],select,textarea{
+  width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:10px 12px;font-size:14px;
+}
+textarea{min-height:80px;resize:vertical;}
+.row{display:flex;gap:10px;}
+.row>*{flex:1;}
+
+.tonegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px;}
+.tone-opt{padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink-dim);font-weight:700;font-size:12.5px;text-align:center;}
+.tone-opt.active{border-color:var(--accent);background:rgba(255,77,141,0.14);color:var(--accent-soft);}
+
+.btn{border:none;border-radius:12px;padding:13px 18px;font-weight:800;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn-accent{background:linear-gradient(155deg,var(--accent-soft),var(--accent));color:#3A0018;}
+.btn-block{width:100%;}
+.btn:disabled{opacity:.55;pointer-events:none;}
+.btn-outline{background:transparent;border:1px solid var(--line);color:var(--ink);padding:8px 13px;font-size:12.5px;font-weight:700;border-radius:9px;}
+.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.25);border-top-color:#3A0018;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.err{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.35);color:var(--danger);padding:10px 12px;border-radius:10px;font-size:12.5px;margin-top:12px;}
+
+.results{display:none;margin-top:6px;}
+.results.show{display:block;}
+.out-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;}
+.out-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:10px;}
+.out-head h3{margin:0;font-size:13.5px;color:var(--gold);}
+.out-body{font-size:13.5px;line-height:1.85;white-space:pre-wrap;color:var(--ink);}
+.kw-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.kw{background:rgba(255,200,87,0.12);color:var(--gold);border:1px solid rgba(255,200,87,0.3);padding:4px 10px;border-radius:14px;font-size:11.5px;font-weight:700;}
+.bullets{margin:0;padding-inline-start:18px;}
+.bullets li{margin-bottom:6px;line-height:1.7;}
+.copied{color:var(--success)!important;}
+.hint{font-size:11.5px;color:var(--ink-dim);margin-top:6px;line-height:1.7;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">📝</div>
+    <div class="brand-name">وصّاف</div>
+  </div>
+  <div class="langbox">
+    <select id="langSwitch" onchange="setLanguage(this.value)">
+      <option value="ar">🇪🇬 العربية</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="fr">🇫🇷 Français</option>
+      <option value="es">🇪🇸 Español</option>
+    </select>
+  </div>
+</div>
+
+<div class="hero">
+  <h1 data-i18n="heroTitle"></h1>
+  <p data-i18n="heroSubtitle"></p>
+  <div class="feature-row">
+    <div class="feature-chip">🔍 <span data-i18n="feature1"></span></div>
+    <div class="feature-chip">🌍 <span data-i18n="feature2"></span></div>
+    <div class="feature-chip">⚡ <span data-i18n="feature3"></span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="section-title">📦 <span data-i18n="sectionProduct"></span></div>
+
+    <label data-i18n="labelName"></label>
+    <input type="text" id="pName" data-i18n-ph="placeholderName">
+
+    <label data-i18n="labelCategory"></label>
+    <select id="pCategory"></select>
+
+    <label data-i18n="labelFeatures"></label>
+    <textarea id="pFeatures" data-i18n-ph="placeholderFeatures"></textarea>
+
+    <label data-i18n="labelAudience"></label>
+    <input type="text" id="pAudience" data-i18n-ph="placeholderAudience">
+
+    <label data-i18n="labelTone"></label>
+    <div class="tonegrid" id="toneGrid"></div>
+
+    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="generateContent()" id="genBtn">
+      <span class="btn-label" data-i18n="btnGenerate"></span>
+    </button>
+    <div class="err" id="genErr" style="display:none;"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="out-card">
+      <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div>
+      <div class="out-body" id="seoOut"></div>
+      <div class="kw-wrap" id="kwWrap"></div>
+    </div>
+
+    <div class="out-card">
+      <div class="out-head"><h3><span data-i18n="outBulletsTitle"></span></h3><button class="btn-outline" onclick="copyOut('bulletsPlain','c2')" id="c2" data-i18n="btnCopy"></button></div>
+      <ul class="bullets" id="bulletsOut"></ul>
+      <div id="bulletsPlainHidden" style="display:none;"></div>
+    </div>
+
+    <div class="out-card">
+      <div class="out-head"><h3><span data-i18n="outFbTitle"></span></h3><button class="btn-outline" onclick="copyOut('fbOut','c3')" id="c3" data-i18n="btnCopy"></button></div>
+      <div class="out-body" id="fbOut"></div>
+    </div>
+
+    <div class="out-card">
+      <div class="out-head"><h3><span data-i18n="outTiktokTitle"></span></h3><button class="btn-outline" onclick="copyOut('tiktokOut','c4')" id="c4" data-i18n="btnCopy"></button></div>
+      <div class="out-body" id="tiktokOut"></div>
+    </div>
+
+    <div class="hint" data-i18n="footerHint"></div>
+  </div>
+</div>
+
+<script>
+const translations = {
+  ar: {
+    dir:'rtl',
+    heroTitle:'محتوى تسويقي <span>احترافي</span> في ثواني',
+    heroSubtitle:'اكتب بيانات منتجك، واحصل على وصف SEO وإعلانات جاهزة بأي لغة تختارها',
+    feature1:'متوافق مع SEO', feature2:'أكثر من لغة', feature3:'نتيجة فورية',
+    sectionProduct:'بيانات المنتج',
+    labelName:'اسم المنتج', placeholderName:'مثال: حذاء رياضي جري',
+    labelCategory:'الفئة',
+    categories:['أزياء','إلكترونيات','مستحضرات تجميل','منتجات منزلية','أطعمة ومشروبات','إكسسوارات','منتجات رقمية / خدمات','أخرى'],
+    labelFeatures:'المميزات الأساسية (افصل بينها بفاصلة)', placeholderFeatures:'مثال: مريح جدًا، مقاوم للماء، خفيف الوزن',
+    labelAudience:'الجمهور المستهدف', placeholderAudience:'مثال: شباب رياضيين 20-35 سنة',
+    labelTone:'نبرة الصوت',
+    tones:['حماسية','احترافية','فكاهية','فاخرة'],
+    btnGenerate:'✨ توليد المحتوى', btnGenerating:'جاري التوليد...',
+    errMissing:'اكتب اسم المنتج والمميزات على الأقل.',
+    errPrefix:'حصل خطأ: ', errSuffix:' — حاول تاني.',
+    outSeoTitle:'🔍 وصف المنتج (SEO)', outBulletsTitle:'⚡ نقاط البيع السريعة',
+    outFbTitle:'📘 إعلان Facebook / Instagram', outTiktokTitle:'🎵 إعلان TikTok',
+    btnCopy:'نسخ', btnCopied:'اتنسخ ✓',
+    footerHint:'راجع النصوص وعدّل عليها بلمستك قبل النشر.',
+    langName:'Arabic (Modern Standard Arabic, easy to read)'
+  },
+  en: {
+    dir:'ltr',
+    heroTitle:'<span>Professional</span> marketing content in seconds',
+    heroSubtitle:'Enter your product details and get an SEO description plus ready ads, in any language you pick',
+    feature1:'SEO-ready', feature2:'Multi-language', feature3:'Instant results',
+    sectionProduct:'Product details',
+    labelName:'Product name', placeholderName:'e.g. Running sports shoe',
+    labelCategory:'Category',
+    categories:['Fashion','Electronics','Cosmetics','Home products','Food & drinks','Accessories','Digital products / Services','Other'],
+    labelFeatures:'Key features (comma-separated)', placeholderFeatures:'e.g. very comfortable, waterproof, lightweight',
+    labelAudience:'Target audience', placeholderAudience:'e.g. athletic people aged 20-35',
+    labelTone:'Tone of voice',
+    tones:['Enthusiastic','Professional','Humorous','Luxurious'],
+    btnGenerate:'✨ Generate content', btnGenerating:'Generating...',
+    errMissing:'Enter at least the product name and features.',
+    errPrefix:'Error: ', errSuffix:' — please try again.',
+    outSeoTitle:'🔍 SEO product description', outBulletsTitle:'⚡ Quick selling points',
+    outFbTitle:'📘 Facebook / Instagram ad', outTiktokTitle:'🎵 TikTok ad',
+    btnCopy:'Copy', btnCopied:'Copied ✓',
+    footerHint:'Review and personalize the text before publishing.',
+    langName:'English'
+  },
+  fr: {
+    dir:'ltr',
+    heroTitle:'Contenu marketing <span>professionnel</span> en quelques secondes',
+    heroSubtitle:"Entrez les détails de votre produit et obtenez une description SEO et des publicités prêtes, dans la langue de votre choix",
+    feature1:'Optimisé SEO', feature2:'Multilingue', feature3:'Résultat instantané',
+    sectionProduct:'Détails du produit',
+    labelName:'Nom du produit', placeholderName:'ex: Chaussure de course',
+    labelCategory:'Catégorie',
+    categories:['Mode','Électronique','Cosmétiques','Produits maison','Alimentation & boissons','Accessoires','Produits numériques / Services','Autre'],
+    labelFeatures:'Caractéristiques principales (séparées par des virgules)', placeholderFeatures:'ex: très confortable, imperméable, léger',
+    labelAudience:'Public cible', placeholderAudience:'ex: sportifs de 20 à 35 ans',
+    labelTone:'Ton de la voix',
+    tones:['Enthousiaste','Professionnel','Humoristique','Luxueux'],
+    btnGenerate:'✨ Générer le contenu', btnGenerating:'Génération...',
+    errMissing:'Entrez au moins le nom du produit et les caractéristiques.',
+    errPrefix:'Erreur : ', errSuffix:' — réessayez.',
+    outSeoTitle:'🔍 Description produit (SEO)', outBulletsTitle:'⚡ Points de vente rapides',
+    outFbTitle:'📘 Publicité Facebook / Instagram', outTiktokTitle:'🎵 Publicité TikTok',
+    btnCopy:'Copier', btnCopied:'Copié ✓',
+    footerHint:'Relisez et personnalisez le texte avant publication.',
+    langName:'French'
+  },
+  es: {
+    dir:'ltr',
+    heroTitle:'Contenido de marketing <span>profesional</span> en segundos',
+    heroSubtitle:'Ingresa los datos de tu producto y obtén una descripción SEO y anuncios listos, en el idioma que elijas',
+    feature1:'Optimizado SEO', feature2:'Multilingüe', feature3:'Resultado instantáneo',
+    sectionProduct:'Datos del producto',
+    labelName:'Nombre del producto', placeholderName:'ej: Zapatilla deportiva de running',
+    labelCategory:'Categoría',
+    categories:['Moda','Electrónica','Cosméticos','Productos para el hogar','Alimentos y bebidas','Accesorios','Productos digitales / Servicios','Otro'],
+    labelFeatures:'Características principales (separadas por comas)', placeholderFeatures:'ej: muy cómodo, resistente al agua, ligero',
+    labelAudience:'Público objetivo', placeholderAudience:'ej: deportistas de 20 a 35 años',
+    labelTone:'Tono de voz',
+    tones:['Entusiasta','Profesional','Humorístico','Lujoso'],
+    btnGenerate:'✨ Generar contenido', btnGenerating:'Generando...',
+    errMissing:'Ingresa al menos el nombre del producto y las características.',
+    errPrefix:'Error: ', errSuffix:' — inténtalo de nuevo.',
+    outSeoTitle:'🔍 Descripción del producto (SEO)', outBulletsTitle:'⚡ Puntos de venta rápidos',
+    outFbTitle:'📘 Anuncio de Facebook / Instagram', outTiktokTitle:'🎵 Anuncio de TikTok',
+    btnCopy:'Copiar', btnCopied:'Copiado ✓',
+    footerHint:'Revisa y personaliza el texto antes de publicarlo.',
+    langName:'Spanish'
+  }
+};
+
+let currentLang = 'ar';
+let selectedToneIndex = 0;
+let selectedCategoryIndex = 0;
+
+async function saveLang(lang){
+  try{ if(window.storage){ await window.storage.set('wassaf_lang', lang, false); return; } }catch(e){}
+  try{ localStorage.setItem('wassaf_lang', lang); }catch(e){}
+}
+async function loadLang(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('wassaf_lang', false);
+      if(r && r.value) return r.value;
+    }
+  }catch(e){}
+  try{ const v = localStorage.getItem('wassaf_lang'); if(v) return v; }catch(e){}
+  return 'ar';
+}
+
+function setLanguage(lang){
+  currentLang = lang;
+  const t = translations[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = t.dir;
+  document.getElementById('langSwitch').value = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.dataset.i18n;
+    if(t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const key = el.dataset.i18nPh;
+    if(t[key] !== undefined) el.placeholder = t[key];
+  });
+
+  const catSel = document.getElementById('pCategory');
+  catSel.innerHTML = t.categories.map((c,i)=>`<option value="${i}">${c}</option>`).join('');
+  catSel.value = selectedCategoryIndex;
+
+  const toneGrid = document.getElementById('toneGrid');
+  toneGrid.innerHTML = t.tones.map((tone,i)=>`<button type="button" class="tone-opt${i===selectedToneIndex?' active':''}" data-idx="${i}" onclick="pickTone(${i})">${tone}</button>`).join('');
+
+  saveLang(lang);
+}
+function pickTone(idx){
+  selectedToneIndex = idx;
+  document.querySelectorAll('.tone-opt').forEach((b,i)=>b.classList.toggle('active', i===idx));
+}
+
+function setLoading(loading){
+  const btn = document.getElementById('genBtn');
+  const t = translations[currentLang];
+  btn.disabled = loading;
+  btn.querySelector('.btn-label').innerHTML = loading ? `<span class="spinner"></span> ${t.btnGenerating}` : t.btnGenerate;
+}
+function showErr(msg){ const el = document.getElementById('genErr'); el.textContent = msg; el.style.display='block'; }
+function hideErr(){ document.getElementById('genErr').style.display='none'; }
+function escapeHtml(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function parseSections(text){
+  const grab = (tag) => {
+    const re = new RegExp('\\['+tag+'\\]([\\s\\S]*?)(?=\\n?\\[[A-Z]+\\]|$)');
+    const m = text.match(re);
+    return m ? m[1].trim() : '';
+  };
+  const bulletsRaw = grab('BULLETS');
+  const keywordsRaw = grab('KEYWORDS');
+  return {
+    seoDescription: grab('SEO'),
+    keywords: keywordsRaw.split(/[،,\n]/).map(s=>s.replace(/^[-•]\s*/,'').trim()).filter(Boolean),
+    bulletPoints: bulletsRaw.split('\n').map(l=>l.replace(/^[-•*]\s*/,'').trim()).filter(Boolean),
+    fbAd: grab('FB'),
+    tiktokAd: grab('TIKTOK')
+  };
+}
+
+async function callClaude(system, user){
+  const response = await fetch('/api/generate', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ system, user })
+  });
+  const data = await response.json();
+  if(!response.ok){ throw new Error((data && data.error && data.error.message) || 'request failed'); }
+  return (data.content||[]).map(b=>b.text||'').join('\n').trim();
+}
+
+function copyOut(elId, btnId){
+  let text;
+  if(elId==='bulletsPlain'){ text = document.getElementById('bulletsPlainHidden').textContent; }
+  else { text = document.getElementById(elId).textContent; }
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById(btnId);
+    const orig = btn.textContent;
+    btn.textContent = translations[currentLang].btnCopied; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+async function generateContent(){
+  const t = translations[currentLang];
+  const name = document.getElementById('pName').value.trim();
+  const features = document.getElementById('pFeatures').value.trim();
+  const audience = document.getElementById('pAudience').value.trim();
+  const categoryText = t.categories[document.getElementById('pCategory').value];
+  const toneText = t.tones[selectedToneIndex];
+
+  hideErr();
+  if(!name || !features){ showErr(t.errMissing); return; }
+
+  setLoading(true);
+  document.getElementById('results').classList.remove('show');
+  try{
+    const system = `You are an expert marketing copywriter specialized in e-commerce product content, writing entirely in ${t.langName}. Follow AIDA principles (Attention, Interest, Desire, Action) for ad copy.
+
+Respond using EXACTLY this format, with no extra commentary before or after, and no Markdown symbols like asterisks:
+
+[SEO]
+(a 3-4 sentence SEO-friendly product description with natural keywords)
+[KEYWORDS]
+(5-8 short keywords separated by commas)
+[BULLETS]
+- selling point 1
+- selling point 2
+- selling point 3
+- selling point 4
+- selling point 5
+[FB]
+(a short-to-medium Facebook/Instagram ad paragraph following AIDA, ending with a clear call to action)
+[TIKTOK]
+(a very short, fast-paced TikTok ad script, max 3-4 short sentences)
+
+IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exactly as shown, in English, but write ALL the actual content inside each section entirely in ${t.langName}.`;
+
+    const user = `Product name: ${name}\nCategory: ${categoryText}\nKey features: ${features}\nTarget audience: ${audience || 'general'}\nTone of voice: ${toneText}`;
+
+    const raw = await callClaude(system, user);
+    const data = parseSections(raw);
+
+    document.getElementById('seoOut').textContent = data.seoDescription || '';
+    document.getElementById('kwWrap').innerHTML = (data.keywords||[]).map(k=>`<span class="kw">${escapeHtml(k)}</span>`).join('');
+    document.getElementById('bulletsOut').innerHTML = (data.bulletPoints||[]).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
+    document.getElementById('bulletsPlainHidden').textContent = (data.bulletPoints||[]).map(b=>'• '+b).join('\n');
+    document.getElementById('fbOut').textContent = data.fbAd || '';
+    document.getElementById('tiktokOut').textContent = data.tiktokAd || '';
+
+    document.getElementById('results').classList.add('show');
+    document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+  }catch(e){
+    console.error(e);
+    showErr(t.errPrefix + (e && e.message ? e.message : '?') + t.errSuffix);
+  }finally{
+    setLoading(false);
+  }
+}
+
+(async function init(){
+  const lang = await loadLang();
+  setLanguage(lang);
+})();
+</script>
+</body>
+</html>

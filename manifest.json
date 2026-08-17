@@ -1,0 +1,15 @@
+{
+  "name": "وصّاف - محتوى تسويقي بالذكاء الاصطناعي",
+  "short_name": "وصّاف",
+  "description": "توليد أوصاف منتجات وإعلانات تسويقية احترافية بالعربية",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F2226",
+  "theme_color": "#0F2226",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
