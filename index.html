@@ -447,24 +447,40 @@ function generateImage(){
   const prompt = selectedImageType === 'logo'
     ? `minimal professional modern logo design for a brand called "${name}", ${categoryText} product, clean vector style, simple icon, flat design, white background, high quality branding logo`
     : `professional product advertisement photo of ${name}, ${categoryText}, ${features}, studio lighting, clean background, high quality marketing photography`;
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&nologo=true&seed=${Date.now()}`;
+ 
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&nologo=true&nofeed=true&safe=true&seed=${Date.now()}`;
  
   btn.disabled = true;
   img.style.display = 'none';
   loadingEl.style.display = 'block';
+  loadingEl.textContent = 'جاري توليد الصورة... (ممكن تاخد لحد 30 ثانية)';
  
-  const tempImg = new Image();
-  tempImg.onload = function(){
-    img.src = url;
+  let doneAlready = false;
+  const timeoutId = setTimeout(()=>{
+    if(!doneAlready){
+      doneAlready = true;
+      loadingEl.textContent = 'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.';
+      btn.disabled = false;
+    }
+  }, 35000);
+ 
+  img.referrerPolicy = 'no-referrer';
+  img.onload = function(){
+    if(doneAlready) return;
+    doneAlready = true;
+    clearTimeout(timeoutId);
     img.style.display = 'block';
     loadingEl.style.display = 'none';
     btn.disabled = false;
   };
-  tempImg.onerror = function(){
-    loadingEl.textContent = 'حصل خطأ في توليد الصورة، حاول تاني.';
+  img.onerror = function(){
+    if(doneAlready) return;
+    doneAlready = true;
+    clearTimeout(timeoutId);
+    loadingEl.textContent = 'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.';
     btn.disabled = false;
   };
-  tempImg.src = url;
+  img.src = url;
 }
  
 (async function init(){
