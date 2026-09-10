@@ -49,6 +49,7 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
       },
       body: JSON.stringify({
         model: 'qwen/qwen3.6-27b',
+        reasoning_effort: 'none',
         messages: [
           { role: 'system', content: system },
           {
@@ -60,7 +61,7 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
           },
         ],
         temperature: 0.7,
-        max_tokens: 1500,
+        max_tokens: 2000,
       }),
     });
  
