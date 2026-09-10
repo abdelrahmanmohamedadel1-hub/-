@@ -479,7 +479,7 @@ async function generateImage(){
     try{
       const base64 = await resizeImageFile(file, 1024);
       const editPrompt = selectedImageType === 'logo'
-        ? `place this exact product from the photo into a minimal professional modern logo composition for a brand called "${name}", clean vector style, flat design, white background, keep the product recognizable`
+        ? `completely redesign this product into a bold, colorful, professional modern brand logo for "${name}", vibrant rich colors, polished premium vector illustration style, glossy modern finish, eye-catching dynamic composition, clean elegant background, high-end branding`
         : `turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic`;
  
       const response = await fetch('/api/generate-image-edit', {
@@ -547,3 +547,10 @@ async function generateImage(){
 </body>
 </html>
  
+
+
+
+
+
+
+
