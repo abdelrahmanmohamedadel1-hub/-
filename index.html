@@ -427,7 +427,7 @@ function setLanguage(lang){
 }
 function pickTone(idx){
   selectedToneIndex = idx;
-  document.querySelectorAll('.tone-opt').forEach((b,i)=>b.classList.toggle('active', i===idx));
+  document.querySelectorAll('#toneGrid .tone-opt').forEach((b,i)=>b.classList.toggle('active', i===idx));
 }
 
 function setLoading(loading){
