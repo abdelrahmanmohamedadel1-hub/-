@@ -148,6 +148,8 @@ textarea{min-height:80px;resize:vertical;}
       <button type="button" class="tone-opt active" id="imgTypeAd" onclick="pickImageType('ad')">صورة إعلان للمنتج</button>
       <button type="button" class="tone-opt" id="imgTypeLogo" onclick="pickImageType('logo')">لوجو للمنتج</button>
     </div>
+    <label>صورة حقيقية للمنتج (اختياري - لو رفعتيها هيستخدم منتجك الحقيقي بدل ما يتخيله)</label>
+    <input type="file" accept="image/*" id="productPhoto" style="margin-bottom:12px;">
     <button class="btn btn-accent btn-block" onclick="generateImage()" id="imgBtn">توليد صورة ✨</button>
     <div class="img-loading" id="imgLoading" style="display:none;">جاري توليد الصورة... (بتاخد كذا ثانية)</div>
     <img class="ad-image" id="adImage" style="display:none;">
@@ -435,7 +437,29 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
   }
 }
  
-function generateImage(){
+function resizeImageFile(file, maxDim){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const img = new Image();
+      img.onload = function(){
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+        else if(h >= w && h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+ 
+async function generateImage(){
   const name = document.getElementById('pName').value.trim();
   const features = document.getElementById('pFeatures').value.trim();
   const categoryText = translations[currentLang].categories[document.getElementById('pCategory').value] || '';
@@ -443,17 +467,49 @@ function generateImage(){
   const btn = document.getElementById('imgBtn');
   const loadingEl = document.getElementById('imgLoading');
   const img = document.getElementById('adImage');
+  const fileInput = document.getElementById('productPhoto');
+  const file = fileInput && fileInput.files && fileInput.files[0];
+ 
+  btn.disabled = true;
+  img.style.display = 'none';
+  loadingEl.style.display = 'block';
+  loadingEl.textContent = 'جاري توليد الصورة... (ممكن تاخد لحد 40 ثانية)';
+ 
+  if(file){
+    try{
+      const base64 = await resizeImageFile(file, 1024);
+      const editPrompt = selectedImageType === 'logo'
+        ? `place this exact product from the photo into a minimal professional modern logo composition for a brand called "${name}", clean vector style, flat design, white background, keep the product recognizable`
+        : `turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic`;
+ 
+      const response = await fetch('/api/generate-image-edit', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ image: base64, prompt: editPrompt })
+      });
+ 
+      if(!response.ok){
+        const errData = await response.json().catch(()=>({}));
+        throw new Error(errData.error || 'edit failed');
+      }
+ 
+      const blob = await response.blob();
+      img.src = URL.createObjectURL(blob);
+      img.style.display = 'block';
+      loadingEl.style.display = 'none';
+      btn.disabled = false;
+    }catch(e){
+      loadingEl.textContent = 'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.';
+      btn.disabled = false;
+    }
+    return;
+  }
  
   const prompt = selectedImageType === 'logo'
     ? `minimal professional modern logo design for a brand called "${name}", ${categoryText} product, clean vector style, simple icon, flat design, white background, high quality branding logo`
     : `professional product advertisement photo of ${name}, ${categoryText}, ${features}, studio lighting, clean background, high quality marketing photography`;
  
   const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}`;
- 
-  btn.disabled = true;
-  img.style.display = 'none';
-  loadingEl.style.display = 'block';
-  loadingEl.textContent = 'جاري توليد الصورة... (ممكن تاخد لحد 30 ثانية)';
  
   let doneAlready = false;
   const timeoutId = setTimeout(()=>{
