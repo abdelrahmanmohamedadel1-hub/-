@@ -535,6 +535,36 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
   }
 }
 
+function compositeLogoText(imageUrl, text){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      const bandHeight = Math.round(img.height * 0.22);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height + bandHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0,0,canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      ctx.fillStyle = '#141414';
+      let fontSize = Math.round(bandHeight * 0.42);
+      ctx.font = `700 ${fontSize}px Cairo, Tajawal, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      while(ctx.measureText(text).width > canvas.width * 0.9 && fontSize > 10){
+        fontSize -= 2;
+        ctx.font = `700 ${fontSize}px Cairo, Tajawal, sans-serif`;
+      }
+      ctx.fillText(text, canvas.width/2, img.height + bandHeight/2);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = imageUrl;
+  });
+}
+
 function resizeImageFile(file, maxDim){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
@@ -577,7 +607,7 @@ async function generateImage(){
     try{
       const base64 = await resizeImageFile(file, 1024);
       const editPrompt = selectedImageType === 'logo'
-        ? `completely redesign this product into a bold, colorful, professional modern brand logo for "${name}", vibrant rich colors, polished premium vector illustration style, glossy modern finish, eye-catching dynamic composition, clean elegant background, high-end branding`
+        ? `completely redesign this product into a bold, colorful, professional modern abstract brand logo symbol, vibrant rich colors, polished premium vector illustration style, glossy modern finish, eye-catching dynamic composition, clean elegant background, high-end branding, no text, no words, no letters, no writing`
         : `turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic`;
 
       const response = await fetch('/api/generate-image-edit', {
@@ -592,7 +622,11 @@ async function generateImage(){
       }
 
       const blob = await response.blob();
-      img.src = URL.createObjectURL(blob);
+      let finalUrl = URL.createObjectURL(blob);
+      if(selectedImageType === 'logo' && name){
+        try{ finalUrl = await compositeLogoText(finalUrl, name); }catch(e){}
+      }
+      img.src = finalUrl;
       img.style.display = 'block';
       loadingEl.style.display = 'none';
       btn.disabled = false;
@@ -604,9 +638,7 @@ async function generateImage(){
   }
 
   const prompt = selectedImageType === 'logo'
-    ? (isMostlyLatin(name)
-        ? `minimal professional modern logo design for a brand called "${name}", ${categoriesEn[document.getElementById('pCategory').value]} product, clean vector style, simple icon, flat design, white background, high quality branding logo, no readable text other than the brand name`
-        : `minimal professional modern abstract logo design for a ${categoriesEn[document.getElementById('pCategory').value]} brand, clean vector style, simple icon, flat design, white background, high quality branding logo, no text or writing`)
+    ? `minimal professional modern abstract logo design symbol for a ${categoriesEn[document.getElementById('pCategory').value]} brand, clean vector style, simple bold icon, flat design, white background, high quality branding logo, no text, no words, no letters, no writing`
     : `professional studio product photography, a single ${categoriesEn[document.getElementById('pCategory').value]} item centered and filling most of the frame, isolated product shot on a table, close-up${isMostlyLatin(features) && features ? ', ' + features : ''}, elegant studio lighting, clean minimal background, high quality commercial marketing photography, no text, no words, no writing, no letters, no room, no empty scene`;
 
   const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}`;
@@ -621,10 +653,16 @@ async function generateImage(){
   }, 55000);
 
   img.referrerPolicy = 'no-referrer';
-  img.onload = function(){
+  img.onload = async function(){
     if(doneAlready) return;
     doneAlready = true;
     clearTimeout(timeoutId);
+    if(selectedImageType === 'logo' && name){
+      try{
+        const composited = await compositeLogoText(img.src, name);
+        img.src = composited;
+      }catch(e){}
+    }
     img.style.display = 'block';
     loadingEl.style.display = 'none';
     btn.disabled = false;
