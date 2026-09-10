@@ -607,7 +607,7 @@ async function generateImage(){
     try{
       const base64 = await resizeImageFile(file, 1024);
       const editPrompt = selectedImageType === 'logo'
-        ? `completely redesign this product into a bold, colorful, professional modern abstract brand logo symbol, vibrant rich colors, polished premium vector illustration style, glossy modern finish, eye-catching dynamic composition, clean elegant background, high-end branding, no text, no words, no letters, no writing`
+        ? `redesign this into a flat 2D vector icon logo mark, app icon style, NOT a photograph, NOT realistic, simple geometric silhouette inspired by this product's shape, minimalist line art, bold vibrant colors, 2-3 colors maximum, isolated on plain solid background, flat illustration, graphic design asset, no photography, no 3d render, no scene, no shadows, no text, no words, no letters, no writing`
         : `turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic`;
 
       const response = await fetch('/api/generate-image-edit', {
@@ -638,7 +638,7 @@ async function generateImage(){
   }
 
   const prompt = selectedImageType === 'logo'
-    ? `minimal professional modern abstract logo design symbol for a ${categoriesEn[document.getElementById('pCategory').value]} brand, clean vector style, simple bold icon, flat design, white background, high quality branding logo, no text, no words, no letters, no writing`
+    ? `flat 2D vector icon logo mark, app icon style, NOT a photograph, NOT realistic, simple geometric shape, single bold silhouette icon representing a ${categoriesEn[document.getElementById('pCategory').value]} brand, minimalist line art, 2 colors maximum, isolated on plain solid white background, flat illustration, graphic design asset, no photography, no 3d render, no scene, no room, no shadows, no text, no words, no letters, no writing`
     : `professional studio product photography, a single ${categoriesEn[document.getElementById('pCategory').value]} item centered and filling most of the frame, isolated product shot on a table, close-up${isMostlyLatin(features) && features ? ', ' + features : ''}, elegant studio lighting, clean minimal background, high quality commercial marketing photography, no text, no words, no writing, no letters, no room, no empty scene`;
 
   const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}`;
