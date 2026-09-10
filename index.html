@@ -117,7 +117,14 @@ textarea{min-height:80px;resize:vertical;}
   </div>
 </div>
  
-<div class="wrap">
+<div class="wrap" style="padding-bottom:0;">
+  <div style="display:flex;gap:8px;margin-top:-8px;margin-bottom:14px;">
+    <button type="button" class="tone-opt active" id="pageTabForm" onclick="switchPage('form')" style="flex:1;">✍️ اكتب البيانات</button>
+    <button type="button" class="tone-opt" id="pageTabPhoto" onclick="switchPage('photo')" style="flex:1;">📸 من صورة بس</button>
+  </div>
+</div>
+ 
+<div class="wrap" id="pageForm">
   <div class="card">
     <div class="section-title">📦 <span data-i18n="sectionProduct"></span></div>
  
@@ -163,7 +170,7 @@ textarea{min-height:80px;resize:vertical;}
     </div>
  
     <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outBulletsTitle"></span></h3><button class="btn-outline" onclick="copyOut('bulletsPlain','c2')" id="c2" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3><span data-i18n="outBulletsTitle"></span></h3><button class="btn-outline" onclick="copyOut('bulletsPlainHidden','c2')" id="c2" data-i18n="btnCopy"></button></div>
       <ul class="bullets" id="bulletsOut"></ul>
       <div id="bulletsPlainHidden" style="display:none;"></div>
     </div>
@@ -179,6 +186,48 @@ textarea{min-height:80px;resize:vertical;}
     </div>
  
     <div class="hint" data-i18n="footerHint"></div>
+  </div>
+</div>
+ 
+<div class="wrap" id="pagePhoto" style="display:none;">
+  <div class="card">
+    <div class="section-title">📸 <span>ارفعي صورة المنتج بس</span></div>
+    <label>صورة المنتج (لازم تكون واضحة، ويظهر فيها اسم المنتج لو موجود)</label>
+    <input type="file" accept="image/*" id="photoOnlyInput">
+    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="analyzeFromPhoto()" id="analyzeBtn">
+      <span class="btn-label" id="analyzeBtnLabel">🔍 اقرأ من الصورة وولّد الإعلان</span>
+    </button>
+    <div class="err" id="analyzeErr" style="display:none;"></div>
+  </div>
+ 
+  <div class="results" id="photoResults">
+    <div class="out-card">
+      <div class="out-head"><h3>🎨 صورة الإعلان</h3></div>
+      <div class="img-loading" id="photoImgLoading" style="display:none;">جاري توليد صورة الإعلان...</div>
+      <img class="ad-image" id="photoAdImage" style="display:none;">
+    </div>
+ 
+    <div class="out-card">
+      <div class="out-head"><h3>🔍 وصف المنتج (SEO)</h3><button class="btn-outline" onclick="copyOut('photoSeoOut','pc1')" id="pc1">نسخ</button></div>
+      <div class="out-body" id="photoSeoOut"></div>
+      <div class="kw-wrap" id="photoKwWrap"></div>
+    </div>
+ 
+    <div class="out-card">
+      <div class="out-head"><h3>⚡ نقاط البيع السريعة</h3><button class="btn-outline" onclick="copyOut('photoBulletsPlainHidden','pc2')" id="pc2">نسخ</button></div>
+      <ul class="bullets" id="photoBulletsOut"></ul>
+      <div id="photoBulletsPlainHidden" style="display:none;"></div>
+    </div>
+ 
+    <div class="out-card">
+      <div class="out-head"><h3>📘 إعلان Facebook / Instagram</h3><button class="btn-outline" onclick="copyOut('photoFbOut','pc3')" id="pc3">نسخ</button></div>
+      <div class="out-body" id="photoFbOut"></div>
+    </div>
+ 
+    <div class="out-card">
+      <div class="out-head"><h3>🎵 إعلان TikTok</h3><button class="btn-outline" onclick="copyOut('photoTiktokOut','pc4')" id="pc4">نسخ</button></div>
+      <div class="out-body" id="photoTiktokOut"></div>
+    </div>
   </div>
 </div>
  
@@ -369,9 +418,7 @@ async function callClaude(system, user){
 }
  
 function copyOut(elId, btnId){
-  let text;
-  if(elId==='bulletsPlain'){ text = document.getElementById('bulletsPlainHidden').textContent; }
-  else { text = document.getElementById(elId).textContent; }
+  const text = document.getElementById(elId).textContent;
   navigator.clipboard.writeText(text).then(()=>{
     const btn = document.getElementById(btnId);
     const orig = btn.textContent;
@@ -539,6 +586,84 @@ async function generateImage(){
   img.src = url;
 }
  
+function switchPage(page){
+  document.getElementById('pageForm').style.display = page==='form' ? '' : 'none';
+  document.getElementById('pagePhoto').style.display = page==='photo' ? '' : 'none';
+  document.getElementById('pageTabForm').classList.toggle('active', page==='form');
+  document.getElementById('pageTabPhoto').classList.toggle('active', page==='photo');
+}
+ 
+async function analyzeFromPhoto(){
+  const fileInput = document.getElementById('photoOnlyInput');
+  const file = fileInput && fileInput.files && fileInput.files[0];
+  const errEl = document.getElementById('analyzeErr');
+  const btn = document.getElementById('analyzeBtn');
+  const btnLabel = document.getElementById('analyzeBtnLabel');
+  errEl.style.display = 'none';
+ 
+  if(!file){
+    errEl.textContent = 'ارفعي صورة المنتج الأول.';
+    errEl.style.display = 'block';
+    return;
+  }
+ 
+  btn.disabled = true;
+  btnLabel.innerHTML = '<span class="spinner"></span> جاري القراءة والتوليد...';
+  document.getElementById('photoResults').classList.remove('show');
+ 
+  const imgOut = document.getElementById('photoAdImage');
+  const imgLoading = document.getElementById('photoImgLoading');
+  imgOut.style.display = 'none';
+  imgLoading.style.display = 'block';
+  imgLoading.textContent = 'جاري توليد صورة الإعلان...';
+ 
+  try{
+    const base64 = await resizeImageFile(file, 1024);
+    const langName = translations[currentLang].langName;
+ 
+    const textRes = await fetch('/api/analyze-image', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ image: base64, langName })
+    });
+    const textData = await textRes.json();
+    if(!textRes.ok){ throw new Error((textData.error && textData.error.message) || 'analyze failed'); }
+    const raw = (textData.content||[]).map(b=>b.text||'').join('\n').trim();
+    const data = parseSections(raw);
+ 
+    document.getElementById('photoSeoOut').textContent = data.seoDescription || '';
+    document.getElementById('photoKwWrap').innerHTML = (data.keywords||[]).map(k=>`<span class="kw">${escapeHtml(k)}</span>`).join('');
+    document.getElementById('photoBulletsOut').innerHTML = (data.bulletPoints||[]).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
+    document.getElementById('photoBulletsPlainHidden').textContent = (data.bulletPoints||[]).map(b=>'• '+b).join('\n');
+    document.getElementById('photoFbOut').textContent = data.fbAd || '';
+    document.getElementById('photoTiktokOut').textContent = data.tiktokAd || '';
+    document.getElementById('photoResults').classList.add('show');
+    document.getElementById('photoResults').scrollIntoView({behavior:'smooth', block:'start'});
+ 
+    const editRes = await fetch('/api/generate-image-edit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ image: base64, prompt: 'turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic' })
+    });
+    if(!editRes.ok){
+      imgLoading.textContent = 'اتولد الوصف تمام، بس حصل خطأ في توليد صورة الإعلان.';
+    } else {
+      const blob = await editRes.blob();
+      imgOut.src = URL.createObjectURL(blob);
+      imgOut.style.display = 'block';
+      imgLoading.style.display = 'none';
+    }
+ 
+  }catch(e){
+    errEl.textContent = 'حصل خطأ: ' + (e.message || '?') + ' — حاول تاني.';
+    errEl.style.display = 'block';
+    imgLoading.style.display = 'none';
+  }finally{
+    btn.disabled = false;
+    btnLabel.textContent = '🔍 اقرأ من الصورة وولّد الإعلان';
+  }
+}
+ 
 (async function init(){
   const lang = await loadLang();
   setLanguage(lang);
@@ -547,10 +672,3 @@ async function generateImage(){
 </body>
 </html>
  
-
-
-
-
-
-
-
