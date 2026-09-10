@@ -448,7 +448,7 @@ function generateImage(){
     ? `minimal professional modern logo design for a brand called "${name}", ${categoryText} product, clean vector style, simple icon, flat design, white background, high quality branding logo`
     : `professional product advertisement photo of ${name}, ${categoryText}, ${features}, studio lighting, clean background, high quality marketing photography`;
  
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&nologo=true&nofeed=true&safe=true&seed=${Date.now()}`;
+  const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}&seed=${Date.now()}`;
  
   btn.disabled = true;
   img.style.display = 'none';
@@ -462,7 +462,7 @@ function generateImage(){
       loadingEl.textContent = 'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.';
       btn.disabled = false;
     }
-  }, 35000);
+  }, 55000);
  
   img.referrerPolicy = 'no-referrer';
   img.onload = function(){
