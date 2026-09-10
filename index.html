@@ -119,8 +119,8 @@ textarea{min-height:80px;resize:vertical;}
  
 <div class="wrap" style="padding-bottom:0;">
   <div style="display:flex;gap:8px;margin-top:-8px;margin-bottom:14px;">
-    <button type="button" class="tone-opt active" id="pageTabForm" onclick="switchPage('form')" style="flex:1;">✍️ اكتب البيانات</button>
-    <button type="button" class="tone-opt" id="pageTabPhoto" onclick="switchPage('photo')" style="flex:1;">📸 من صورة بس</button>
+    <button type="button" class="tone-opt active" id="pageTabForm" onclick="switchPage('form')" style="flex:1;" data-i18n="tabForm"></button>
+    <button type="button" class="tone-opt" id="pageTabPhoto" onclick="switchPage('photo')" style="flex:1;" data-i18n="tabPhoto"></button>
   </div>
 </div>
  
@@ -150,15 +150,15 @@ textarea{min-height:80px;resize:vertical;}
   </div>
  
   <div class="out-card">
-    <div class="out-head"><h3>🎨 صورة للإعلان</h3></div>
+    <div class="out-head"><h3 data-i18n="imgCardTitle"></h3></div>
     <div class="tonegrid" style="margin-bottom:10px;">
-      <button type="button" class="tone-opt active" id="imgTypeAd" onclick="pickImageType('ad')">صورة إعلان للمنتج</button>
-      <button type="button" class="tone-opt" id="imgTypeLogo" onclick="pickImageType('logo')">لوجو للمنتج</button>
+      <button type="button" class="tone-opt active" id="imgTypeAd" onclick="pickImageType('ad')" data-i18n="imgTypeAd"></button>
+      <button type="button" class="tone-opt" id="imgTypeLogo" onclick="pickImageType('logo')" data-i18n="imgTypeLogo"></button>
     </div>
-    <label>صورة حقيقية للمنتج (اختياري - لو رفعتيها هيستخدم منتجك الحقيقي بدل ما يتخيله)</label>
+    <label data-i18n="imgUploadLabel"></label>
     <input type="file" accept="image/*" id="productPhoto" style="margin-bottom:12px;">
-    <button class="btn btn-accent btn-block" onclick="generateImage()" id="imgBtn">توليد صورة ✨</button>
-    <div class="img-loading" id="imgLoading" style="display:none;">جاري توليد الصورة... (بتاخد كذا ثانية)</div>
+    <button class="btn btn-accent btn-block" onclick="generateImage()" id="imgBtn"><span data-i18n="btnGenImage"></span></button>
+    <div class="img-loading" id="imgLoading" style="display:none;"></div>
     <img class="ad-image" id="adImage" style="display:none;">
   </div>
  
@@ -191,41 +191,41 @@ textarea{min-height:80px;resize:vertical;}
  
 <div class="wrap" id="pagePhoto" style="display:none;">
   <div class="card">
-    <div class="section-title">📸 <span>ارفعي صورة المنتج بس</span></div>
-    <label>صورة المنتج (لازم تكون واضحة، ويظهر فيها اسم المنتج لو موجود)</label>
+    <div class="section-title" data-i18n="photoSectionTitle"></div>
+    <label data-i18n="photoUploadLabel"></label>
     <input type="file" accept="image/*" id="photoOnlyInput">
     <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="analyzeFromPhoto()" id="analyzeBtn">
-      <span class="btn-label" id="analyzeBtnLabel">🔍 اقرأ من الصورة وولّد الإعلان</span>
+      <span class="btn-label" id="analyzeBtnLabel" data-i18n="btnAnalyze"></span>
     </button>
     <div class="err" id="analyzeErr" style="display:none;"></div>
   </div>
  
   <div class="results" id="photoResults">
     <div class="out-card">
-      <div class="out-head"><h3>🎨 صورة الإعلان</h3></div>
-      <div class="img-loading" id="photoImgLoading" style="display:none;">جاري توليد صورة الإعلان...</div>
+      <div class="out-head"><h3 data-i18n="imgCardTitle"></h3></div>
+      <div class="img-loading" id="photoImgLoading" style="display:none;"></div>
       <img class="ad-image" id="photoAdImage" style="display:none;">
     </div>
  
     <div class="out-card">
-      <div class="out-head"><h3>🔍 وصف المنتج (SEO)</h3><button class="btn-outline" onclick="copyOut('photoSeoOut','pc1')" id="pc1">نسخ</button></div>
+      <div class="out-head"><h3 data-i18n="outSeoTitle"></h3><button class="btn-outline" onclick="copyOut('photoSeoOut','pc1')" id="pc1" data-i18n="btnCopy"></button></div>
       <div class="out-body" id="photoSeoOut"></div>
       <div class="kw-wrap" id="photoKwWrap"></div>
     </div>
  
     <div class="out-card">
-      <div class="out-head"><h3>⚡ نقاط البيع السريعة</h3><button class="btn-outline" onclick="copyOut('photoBulletsPlainHidden','pc2')" id="pc2">نسخ</button></div>
+      <div class="out-head"><h3 data-i18n="outBulletsTitle"></h3><button class="btn-outline" onclick="copyOut('photoBulletsPlainHidden','pc2')" id="pc2" data-i18n="btnCopy"></button></div>
       <ul class="bullets" id="photoBulletsOut"></ul>
       <div id="photoBulletsPlainHidden" style="display:none;"></div>
     </div>
  
     <div class="out-card">
-      <div class="out-head"><h3>📘 إعلان Facebook / Instagram</h3><button class="btn-outline" onclick="copyOut('photoFbOut','pc3')" id="pc3">نسخ</button></div>
+      <div class="out-head"><h3 data-i18n="outFbTitle"></h3><button class="btn-outline" onclick="copyOut('photoFbOut','pc3')" id="pc3" data-i18n="btnCopy"></button></div>
       <div class="out-body" id="photoFbOut"></div>
     </div>
  
     <div class="out-card">
-      <div class="out-head"><h3>🎵 إعلان TikTok</h3><button class="btn-outline" onclick="copyOut('photoTiktokOut','pc4')" id="pc4">نسخ</button></div>
+      <div class="out-head"><h3 data-i18n="outTiktokTitle"></h3><button class="btn-outline" onclick="copyOut('photoTiktokOut','pc4')" id="pc4" data-i18n="btnCopy"></button></div>
       <div class="out-body" id="photoTiktokOut"></div>
     </div>
   </div>
@@ -253,6 +253,17 @@ const translations = {
     outFbTitle:'📘 إعلان Facebook / Instagram', outTiktokTitle:'🎵 إعلان TikTok',
     btnCopy:'نسخ', btnCopied:'اتنسخ ✓',
     footerHint:'راجع النصوص وعدّل عليها بلمستك قبل النشر.',
+    tabForm:'✍️ اكتب البيانات', tabPhoto:'📸 من صورة بس',
+    imgCardTitle:'🎨 صورة للإعلان', imgTypeAd:'صورة إعلان للمنتج', imgTypeLogo:'لوجو للمنتج',
+    imgUploadLabel:'صورة حقيقية للمنتج (اختياري - لو رفعتيها هيستخدم منتجك الحقيقي بدل ما يتخيله)',
+    btnGenImage:'توليد صورة ✨',
+    imgLoadingText:'جاري توليد الصورة... (بتاخد كذا ثانية)',
+    imgTimeoutText:'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.',
+    imgErrText:'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.',
+    photoSectionTitle:'📸 ارفعي صورة المنتج بس',
+    photoUploadLabel:'صورة المنتج (لازم تكون واضحة، ويظهر فيها اسم المنتج لو موجود)',
+    btnAnalyze:'🔍 اقرأ من الصورة وولّد الإعلان', btnAnalyzing:'جاري القراءة والتوليد...',
+    analyzeErrNoFile:'ارفعي صورة المنتج الأول.',
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -275,6 +286,17 @@ const translations = {
     outFbTitle:'📘 Facebook / Instagram ad', outTiktokTitle:'🎵 TikTok ad',
     btnCopy:'Copy', btnCopied:'Copied ✓',
     footerHint:'Review and personalize the text before publishing.',
+    tabForm:'✍️ Enter details', tabPhoto:'📸 Photo only',
+    imgCardTitle:'🎨 Ad image', imgTypeAd:'Product ad image', imgTypeLogo:'Product logo',
+    imgUploadLabel:'Real product photo (optional — if uploaded, your actual product is used instead of an imagined one)',
+    btnGenImage:'Generate image ✨',
+    imgLoadingText:'Generating image... (may take a few seconds)',
+    imgTimeoutText:'This is taking longer than expected — try again in a bit if it does not finish.',
+    imgErrText:'Something went wrong generating the image, try again in a few seconds.',
+    photoSectionTitle:'📸 Just upload a product photo',
+    photoUploadLabel:'Product photo (should be clear, showing the product name if visible)',
+    btnAnalyze:'🔍 Read the photo and generate the ad', btnAnalyzing:'Reading and generating...',
+    analyzeErrNoFile:'Upload a product photo first.',
     langName:'English'
   },
   fr: {
@@ -297,6 +319,17 @@ const translations = {
     outFbTitle:'📘 Publicité Facebook / Instagram', outTiktokTitle:'🎵 Publicité TikTok',
     btnCopy:'Copier', btnCopied:'Copié ✓',
     footerHint:'Relisez et personnalisez le texte avant publication.',
+    tabForm:'✍️ Saisir les détails', tabPhoto:'📸 Photo uniquement',
+    imgCardTitle:'🎨 Image publicitaire', imgTypeAd:'Photo publicitaire du produit', imgTypeLogo:'Logo du produit',
+    imgUploadLabel:"Photo réelle du produit (optionnel — si ajoutée, votre produit réel sera utilisé au lieu d'un produit imaginé)",
+    btnGenImage:'Générer une image ✨',
+    imgLoadingText:"Génération de l'image... (quelques secondes)",
+    imgTimeoutText:'Cela prend plus de temps que prévu — réessayez dans un instant si rien ne se passe.',
+    imgErrText:"Une erreur est survenue lors de la génération de l'image, réessayez dans quelques secondes.",
+    photoSectionTitle:'📸 Téléchargez simplement une photo du produit',
+    photoUploadLabel:'Photo du produit (doit être claire, montrant le nom du produit si visible)',
+    btnAnalyze:'🔍 Lire la photo et générer la publicité', btnAnalyzing:'Lecture et génération...',
+    analyzeErrNoFile:"Téléchargez d'abord une photo du produit.",
     langName:'French'
   },
   es: {
@@ -319,6 +352,17 @@ const translations = {
     outFbTitle:'📘 Anuncio de Facebook / Instagram', outTiktokTitle:'🎵 Anuncio de TikTok',
     btnCopy:'Copiar', btnCopied:'Copiado ✓',
     footerHint:'Revisa y personaliza el texto antes de publicarlo.',
+    tabForm:'✍️ Escribir datos', tabPhoto:'📸 Solo foto',
+    imgCardTitle:'🎨 Imagen publicitaria', imgTypeAd:'Foto publicitaria del producto', imgTypeLogo:'Logo del producto',
+    imgUploadLabel:'Foto real del producto (opcional — si la subes, se usará tu producto real en lugar de uno imaginado)',
+    btnGenImage:'Generar imagen ✨',
+    imgLoadingText:'Generando imagen... (unos segundos)',
+    imgTimeoutText:'Esto está tardando más de lo esperado — inténtalo de nuevo en un momento si no termina.',
+    imgErrText:'Ocurrió un error al generar la imagen, inténtalo de nuevo en unos segundos.',
+    photoSectionTitle:'📸 Solo sube una foto del producto',
+    photoUploadLabel:'Foto del producto (debe ser clara, mostrando el nombre del producto si es visible)',
+    btnAnalyze:'🔍 Leer la foto y generar el anuncio', btnAnalyzing:'Leyendo y generando...',
+    analyzeErrNoFile:'Sube primero una foto del producto.',
     langName:'Spanish'
   }
 };
@@ -520,7 +564,7 @@ async function generateImage(){
   btn.disabled = true;
   img.style.display = 'none';
   loadingEl.style.display = 'block';
-  loadingEl.textContent = 'جاري توليد الصورة... (ممكن تاخد لحد 40 ثانية)';
+  loadingEl.textContent = translations[currentLang].imgLoadingText;
  
   if(file){
     try{
@@ -546,7 +590,7 @@ async function generateImage(){
       loadingEl.style.display = 'none';
       btn.disabled = false;
     }catch(e){
-      loadingEl.textContent = 'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.';
+      loadingEl.textContent = translations[currentLang].imgErrText;
       btn.disabled = false;
     }
     return;
@@ -562,7 +606,7 @@ async function generateImage(){
   const timeoutId = setTimeout(()=>{
     if(!doneAlready){
       doneAlready = true;
-      loadingEl.textContent = 'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.';
+      loadingEl.textContent = translations[currentLang].imgTimeoutText;
       btn.disabled = false;
     }
   }, 55000);
@@ -580,7 +624,7 @@ async function generateImage(){
     if(doneAlready) return;
     doneAlready = true;
     clearTimeout(timeoutId);
-    loadingEl.textContent = 'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.';
+    loadingEl.textContent = translations[currentLang].imgErrText;
     btn.disabled = false;
   };
   img.src = url;
@@ -599,27 +643,28 @@ async function analyzeFromPhoto(){
   const errEl = document.getElementById('analyzeErr');
   const btn = document.getElementById('analyzeBtn');
   const btnLabel = document.getElementById('analyzeBtnLabel');
+  const t = translations[currentLang];
   errEl.style.display = 'none';
  
   if(!file){
-    errEl.textContent = 'ارفعي صورة المنتج الأول.';
+    errEl.textContent = t.analyzeErrNoFile;
     errEl.style.display = 'block';
     return;
   }
  
   btn.disabled = true;
-  btnLabel.innerHTML = '<span class="spinner"></span> جاري القراءة والتوليد...';
+  btnLabel.innerHTML = `<span class="spinner"></span> ${t.btnAnalyzing}`;
   document.getElementById('photoResults').classList.remove('show');
  
   const imgOut = document.getElementById('photoAdImage');
   const imgLoading = document.getElementById('photoImgLoading');
   imgOut.style.display = 'none';
   imgLoading.style.display = 'block';
-  imgLoading.textContent = 'جاري توليد صورة الإعلان...';
+  imgLoading.textContent = t.imgLoadingText;
  
   try{
     const base64 = await resizeImageFile(file, 1024);
-    const langName = translations[currentLang].langName;
+    const langName = t.langName;
  
     const textRes = await fetch('/api/analyze-image', {
       method: 'POST',
@@ -646,7 +691,7 @@ async function analyzeFromPhoto(){
       body: JSON.stringify({ image: base64, prompt: 'turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic' })
     });
     if(!editRes.ok){
-      imgLoading.textContent = 'اتولد الوصف تمام، بس حصل خطأ في توليد صورة الإعلان.';
+      imgLoading.textContent = t.imgErrText;
     } else {
       const blob = await editRes.blob();
       imgOut.src = URL.createObjectURL(blob);
@@ -655,12 +700,12 @@ async function analyzeFromPhoto(){
     }
  
   }catch(e){
-    errEl.textContent = 'حصل خطأ: ' + (e.message || '?') + ' — حاول تاني.';
+    errEl.textContent = t.errPrefix + (e.message || '?') + t.errSuffix;
     errEl.style.display = 'block';
     imgLoading.style.display = 'none';
   }finally{
     btn.disabled = false;
-    btnLabel.textContent = '🔍 اقرأ من الصورة وولّد الإعلان';
+    btnLabel.textContent = t.btnAnalyze;
   }
 }
  
