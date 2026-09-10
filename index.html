@@ -367,6 +367,13 @@ const translations = {
   }
 };
  
+const categoriesEn = ['Fashion','Electronics','Cosmetics','Home appliances','Food & drinks','Accessories','Digital products / Services','General'];
+function isMostlyLatin(str){
+  if(!str) return false;
+  const nonLatin = (str.match(/[^\x00-\x7F]/g)||[]).length;
+  return nonLatin < str.length * 0.3;
+}
+ 
 let currentLang = 'ar';
 let selectedToneIndex = 0;
 let selectedCategoryIndex = 0;
@@ -597,8 +604,10 @@ async function generateImage(){
   }
  
   const prompt = selectedImageType === 'logo'
-    ? `minimal professional modern logo design for a brand called "${name}", ${categoryText} product, clean vector style, simple icon, flat design, white background, high quality branding logo`
-    : `professional product advertisement photo of ${name}, ${categoryText}, ${features}, studio lighting, clean background, high quality marketing photography`;
+    ? (isMostlyLatin(name)
+        ? `minimal professional modern logo design for a brand called "${name}", ${categoriesEn[document.getElementById('pCategory').value]} product, clean vector style, simple icon, flat design, white background, high quality branding logo, no readable text other than the brand name`
+        : `minimal professional modern abstract logo design for a ${categoriesEn[document.getElementById('pCategory').value]} brand, clean vector style, simple icon, flat design, white background, high quality branding logo, no text or writing`)
+    : `professional advertisement photography for a ${categoriesEn[document.getElementById('pCategory').value]} product${isMostlyLatin(features) && features ? ', ' + features : ''}, elegant studio lighting, clean minimal background, high quality commercial marketing photography, no text, no words, no writing, no letters`;
  
   const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}`;
  
