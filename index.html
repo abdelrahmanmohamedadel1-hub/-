@@ -448,7 +448,7 @@ function generateImage(){
     ? `minimal professional modern logo design for a brand called "${name}", ${categoryText} product, clean vector style, simple icon, flat design, white background, high quality branding logo`
     : `professional product advertisement photo of ${name}, ${categoryText}, ${features}, studio lighting, clean background, high quality marketing photography`;
  
-  const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}&seed=${Date.now()}`;
+  const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}`;
  
   btn.disabled = true;
   img.style.display = 'none';
