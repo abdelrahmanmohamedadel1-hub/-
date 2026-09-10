@@ -453,9 +453,12 @@ function parseSections(text){
     keywords: keywordsRaw.split(/[،,\n]/).map(s=>s.replace(/^[-•]\s*/,'').trim()).filter(Boolean),
     bulletPoints: bulletsRaw.split('\n').map(l=>l.replace(/^[-•*]\s*/,'').trim()).filter(Boolean),
     fbAd: grab('FB'),
-    tiktokAd: grab('TIKTOK')
+    tiktokAd: grab('TIKTOK'),
+    imagePrompt: grab('IMAGE_PROMPT')
   };
 }
+
+let lastImagePrompt = '';
 
 async function callClaude(system, user){
   const response = await fetch('/api/generate', {
@@ -510,8 +513,10 @@ Respond using EXACTLY this format, with no extra commentary before or after, and
 (a short-to-medium Facebook/Instagram ad paragraph following AIDA, ending with a clear call to action)
 [TIKTOK]
 (a very short, fast-paced TikTok ad script, max 3-4 short sentences)
+[IMAGE_PROMPT]
+(a concise, purely visual, physical description of the product itself in English ONLY, 1-2 sentences, mentioning size, type, shape, color, and material whenever that information is known from the input. Do not mention the brand name or any text. Always write this section in English regardless of the requested content language. Example: "a 43 inch flat screen smart TV with thin black bezels, mounted on a stand")
 
-IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exactly as shown, in English, but write ALL the actual content inside each section entirely in ${t.langName}.`;
+IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] [IMAGE_PROMPT] exactly as shown, in English. Write the content inside [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] entirely in ${t.langName}. Write the content inside [IMAGE_PROMPT] entirely in English, no matter what ${t.langName} is.`;
 
     const user = `Product name: ${name}\nCategory: ${categoryText}\nKey features: ${features}\nTarget audience: ${audience || 'general'}\nTone of voice: ${toneText}`;
 
@@ -524,6 +529,7 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
     document.getElementById('bulletsPlainHidden').textContent = (data.bulletPoints||[]).map(b=>'• '+b).join('\n');
     document.getElementById('fbOut').textContent = data.fbAd || '';
     document.getElementById('tiktokOut').textContent = data.tiktokAd || '';
+    lastImagePrompt = data.imagePrompt || '';
 
     document.getElementById('results').classList.add('show');
     document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
@@ -639,7 +645,7 @@ async function generateImage(){
 
   const prompt = selectedImageType === 'logo'
     ? `flat 2D vector icon logo mark, app icon style, NOT a photograph, NOT realistic, simple geometric shape, single bold silhouette icon representing a ${categoriesEn[document.getElementById('pCategory').value]} brand, minimalist line art, 2 colors maximum, isolated on plain solid white background, flat illustration, graphic design asset, no photography, no 3d render, no scene, no room, no shadows, no text, no words, no letters, no writing`
-    : `professional studio product photography, a single ${categoriesEn[document.getElementById('pCategory').value]} item centered and filling most of the frame, isolated product shot on a table, close-up${isMostlyLatin(features) && features ? ', ' + features : ''}, elegant studio lighting, clean minimal background, high quality commercial marketing photography, no text, no words, no writing, no letters, no room, no empty scene`;
+    : `professional studio product photography, ${lastImagePrompt ? lastImagePrompt : `a single ${categoriesEn[document.getElementById('pCategory').value]} item`}, centered and filling most of the frame, isolated product shot on a table${isMostlyLatin(features) && features ? ', ' + features : ''}, elegant studio lighting, clean minimal background, high quality commercial marketing photography, no text, no words, no writing, no letters, no room, no empty scene`;
 
   const url = `/api/generate-image?prompt=${encodeURIComponent(prompt)}`;
 
