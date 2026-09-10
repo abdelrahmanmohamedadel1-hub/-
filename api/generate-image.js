@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     }
  
     const token = process.env.POLLINATIONS_TOKEN;
-    const seed = req.query.seed || Date.now();
+    const seed = Math.floor(Math.random() * 2147483647);
     const targetUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true&nofeed=true&safe=true&seed=${seed}`;
  
     const headers = {};
