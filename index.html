@@ -155,7 +155,7 @@ textarea{min-height:80px;resize:vertical;}
       <button type="button" class="tone-opt active" id="imgTypeAd" onclick="pickImageType('ad')" data-i18n="imgTypeAd"></button>
       <button type="button" class="tone-opt" id="imgTypeLogo" onclick="pickImageType('logo')" data-i18n="imgTypeLogo"></button>
     </div>
-    <label data-i18n="imgUploadLabel"></label>
+    <label data-i18n="imgUploadLabel" style="color:var(--gold);"></label>
     <input type="file" accept="image/*" id="productPhoto" style="margin-bottom:12px;">
     <button class="btn btn-accent btn-block" onclick="generateImage()" id="imgBtn"><span data-i18n="btnGenImage"></span></button>
     <div class="img-loading" id="imgLoading" style="display:none;"></div>
@@ -255,7 +255,7 @@ const translations = {
     footerHint:'راجع النصوص وعدّل عليها بلمستك قبل النشر.',
     tabForm:'✍️ اكتب البيانات', tabPhoto:'📸 من صورة بس',
     imgCardTitle:'🎨 صورة للإعلان', imgTypeAd:'صورة إعلان للمنتج', imgTypeLogo:'لوجو للمنتج',
-    imgUploadLabel:'صورة حقيقية للمنتج (اختياري - لو رفعتيها هيستخدم منتجك الحقيقي بدل ما يتخيله)',
+    imgUploadLabel:'⭐ لأفضل نتيجة احترافية، ارفعي صورة حقيقية للمنتج هنا (لو متاحة) - الذكاء الاصطناعي هيحسّنها بدل ما يتخيل شكل عام',
     btnGenImage:'توليد صورة ✨',
     imgLoadingText:'جاري توليد الصورة... (بتاخد كذا ثانية)',
     imgTimeoutText:'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.',
@@ -288,7 +288,7 @@ const translations = {
     footerHint:'Review and personalize the text before publishing.',
     tabForm:'✍️ Enter details', tabPhoto:'📸 Photo only',
     imgCardTitle:'🎨 Ad image', imgTypeAd:'Product ad image', imgTypeLogo:'Product logo',
-    imgUploadLabel:'Real product photo (optional — if uploaded, your actual product is used instead of an imagined one)',
+    imgUploadLabel:'⭐ For the most professional result, upload a real product photo here if you have one — the AI will enhance it instead of imagining a generic look',
     btnGenImage:'Generate image ✨',
     imgLoadingText:'Generating image... (may take a few seconds)',
     imgTimeoutText:'This is taking longer than expected — try again in a bit if it does not finish.',
@@ -321,7 +321,7 @@ const translations = {
     footerHint:'Relisez et personnalisez le texte avant publication.',
     tabForm:'✍️ Saisir les détails', tabPhoto:'📸 Photo uniquement',
     imgCardTitle:'🎨 Image publicitaire', imgTypeAd:'Photo publicitaire du produit', imgTypeLogo:'Logo du produit',
-    imgUploadLabel:"Photo réelle du produit (optionnel — si ajoutée, votre produit réel sera utilisé au lieu d'un produit imaginé)",
+    imgUploadLabel:"⭐ Pour un résultat vraiment professionnel, ajoutez une photo réelle du produit ici si possible — l'IA l'améliorera au lieu d'imaginer un rendu générique",
     btnGenImage:'Générer une image ✨',
     imgLoadingText:"Génération de l'image... (quelques secondes)",
     imgTimeoutText:'Cela prend plus de temps que prévu — réessayez dans un instant si rien ne se passe.',
@@ -354,7 +354,7 @@ const translations = {
     footerHint:'Revisa y personaliza el texto antes de publicarlo.',
     tabForm:'✍️ Escribir datos', tabPhoto:'📸 Solo foto',
     imgCardTitle:'🎨 Imagen publicitaria', imgTypeAd:'Foto publicitaria del producto', imgTypeLogo:'Logo del producto',
-    imgUploadLabel:'Foto real del producto (opcional — si la subes, se usará tu producto real en lugar de uno imaginado)',
+    imgUploadLabel:'⭐ Para el resultado más profesional, sube aquí una foto real del producto si la tienes — la IA la mejorará en lugar de imaginar un aspecto genérico',
     btnGenImage:'Generar imagen ✨',
     imgLoadingText:'Generando imagen... (unos segundos)',
     imgTimeoutText:'Esto está tardando más de lo esperado — inténtalo de nuevo en un momento si no termina.',
