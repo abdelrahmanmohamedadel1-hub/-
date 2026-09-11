@@ -163,6 +163,7 @@ textarea{min-height:80px;resize:vertical;}
   </div>
 
   <div class="results" id="results">
+    <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('seoOut').textContent, document.getElementById('bulletsPlainHidden').textContent, document.getElementById('fbOut').textContent, document.getElementById('tiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
     <div class="out-card">
       <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('seoOut').textContent)" id="s1">🔊</button><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="seoOut"></div>
@@ -170,18 +171,18 @@ textarea{min-height:80px;resize:vertical;}
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outBulletsTitle"></span></h3><button class="btn-outline" onclick="copyOut('bulletsPlainHidden','c2')" id="c2" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3><span data-i18n="outBulletsTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('bulletsPlainHidden').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('bulletsPlainHidden','c2')" id="c2" data-i18n="btnCopy"></button></div></div>
       <ul class="bullets" id="bulletsOut"></ul>
       <div id="bulletsPlainHidden" style="display:none;"></div>
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outFbTitle"></span></h3><button class="btn-outline" onclick="copyOut('fbOut','c3')" id="c3" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3><span data-i18n="outFbTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('fbOut').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('fbOut','c3')" id="c3" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="fbOut"></div>
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outTiktokTitle"></span></h3><button class="btn-outline" onclick="copyOut('tiktokOut','c4')" id="c4" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3><span data-i18n="outTiktokTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('tiktokOut').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('tiktokOut','c4')" id="c4" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="tiktokOut"></div>
     </div>
 
@@ -201,6 +202,7 @@ textarea{min-height:80px;resize:vertical;}
   </div>
 
   <div class="results" id="photoResults">
+    <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('photoSeoOut').textContent, document.getElementById('photoBulletsPlainHidden').textContent, document.getElementById('photoFbOut').textContent, document.getElementById('photoTiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
     <div class="out-card">
       <div class="out-head"><h3 data-i18n="imgCardTitle"></h3></div>
       <div class="img-loading" id="photoImgLoading" style="display:none;"></div>
@@ -214,18 +216,18 @@ textarea{min-height:80px;resize:vertical;}
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3 data-i18n="outBulletsTitle"></h3><button class="btn-outline" onclick="copyOut('photoBulletsPlainHidden','pc2')" id="pc2" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3 data-i18n="outBulletsTitle"></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('photoBulletsPlainHidden').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('photoBulletsPlainHidden','pc2')" id="pc2" data-i18n="btnCopy"></button></div></div>
       <ul class="bullets" id="photoBulletsOut"></ul>
       <div id="photoBulletsPlainHidden" style="display:none;"></div>
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3 data-i18n="outFbTitle"></h3><button class="btn-outline" onclick="copyOut('photoFbOut','pc3')" id="pc3" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3 data-i18n="outFbTitle"></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('photoFbOut').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('photoFbOut','pc3')" id="pc3" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="photoFbOut"></div>
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3 data-i18n="outTiktokTitle"></h3><button class="btn-outline" onclick="copyOut('photoTiktokOut','pc4')" id="pc4" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3 data-i18n="outTiktokTitle"></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('photoTiktokOut').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('photoTiktokOut','pc4')" id="pc4" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="photoTiktokOut"></div>
     </div>
   </div>
@@ -264,6 +266,7 @@ const translations = {
     photoUploadLabel:'صورة المنتج (لازم تكون واضحة، ويظهر فيها اسم المنتج لو موجود)',
     btnAnalyze:'🔍 اقرأ من الصورة وولّد الإعلان', btnAnalyzing:'جاري القراءة والتوليد...',
     analyzeErrNoFile:'ارفعي صورة المنتج الأول.',
+    btnSpeakAll:'اسمع كل حاجة',
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -297,6 +300,7 @@ const translations = {
     photoUploadLabel:'Product photo (should be clear, showing the product name if visible)',
     btnAnalyze:'🔍 Read the photo and generate the ad', btnAnalyzing:'Reading and generating...',
     analyzeErrNoFile:'Upload a product photo first.',
+    btnSpeakAll:'Listen to everything',
     langName:'English'
   },
   fr: {
@@ -330,6 +334,7 @@ const translations = {
     photoUploadLabel:'Photo du produit (doit être claire, montrant le nom du produit si visible)',
     btnAnalyze:'🔍 Lire la photo et générer la publicité', btnAnalyzing:'Lecture et génération...',
     analyzeErrNoFile:"Téléchargez d'abord une photo du produit.",
+    btnSpeakAll:'Tout écouter',
     langName:'French'
   },
   es: {
@@ -363,6 +368,7 @@ const translations = {
     photoUploadLabel:'Foto del producto (debe ser clara, mostrando el nombre del producto si es visible)',
     btnAnalyze:'🔍 Leer la foto y generar el anuncio', btnAnalyzing:'Leyendo y generando...',
     analyzeErrNoFile:'Sube primero una foto del producto.',
+    btnSpeakAll:'Escuchar todo',
     langName:'Spanish'
   }
 };
