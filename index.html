@@ -164,7 +164,7 @@ textarea{min-height:80px;resize:vertical;}
 
   <div class="results" id="results">
     <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('seoOut').textContent)" id="s1">🔊</button><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="seoOut"></div>
       <div class="kw-wrap" id="kwWrap"></div>
     </div>
@@ -208,7 +208,7 @@ textarea{min-height:80px;resize:vertical;}
     </div>
 
     <div class="out-card">
-      <div class="out-head"><h3 data-i18n="outSeoTitle"></h3><button class="btn-outline" onclick="copyOut('photoSeoOut','pc1')" id="pc1" data-i18n="btnCopy"></button></div>
+      <div class="out-head"><h3 data-i18n="outSeoTitle"></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('photoSeoOut').textContent)" id="ps1">🔊</button><button class="btn-outline" onclick="copyOut('photoSeoOut','pc1')" id="pc1" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="photoSeoOut"></div>
       <div class="kw-wrap" id="photoKwWrap"></div>
     </div>
@@ -681,6 +681,15 @@ async function generateImage(){
     btn.disabled = false;
   };
   img.src = url;
+}
+
+const langCodeMap = { ar:'ar-SA', en:'en-US', fr:'fr-FR', es:'es-ES' };
+function speakText(text){
+  if(!text || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = langCodeMap[currentLang] || 'ar-SA';
+  window.speechSynthesis.speak(utter);
 }
 
 function switchPage(page){
