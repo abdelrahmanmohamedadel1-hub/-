@@ -9,21 +9,33 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wassaf">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="apple-touch-icon" href="/logo.png">
 <title>وصّاف · Wassaf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0E2024; --bg2:#0A1719; --surface:#173033; --card:#1C3A3E; --line:#2C4E52;
-  --ink:#EAF5F3; --ink-dim:#8FB3B0;
-  --accent:#FF4D8D; --accent-soft:#FF7BAA;
+  --bg:#12082B;
+  --card:#1E1240;
+  --ink:#FFFFFF; --ink-dim:rgba(255,255,255,0.68);
+  --accent:#FF3D81; --accent-soft:#FF7BAA;
   --gold:#FFC857;
-  --success:#4ADE80; --danger:#F87171;
+  --success:#4ADE80; --danger:#FF8A9B;
   --font-d:'Cairo',sans-serif; --font-b:'Tajawal',sans-serif; --font-lat:'Poppins',sans-serif;
 }
 *{box-sizing:border-box;}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);}
+html,body{margin:0;color:var(--ink);font-family:var(--font-b);min-height:100%;}
+body{
+  position:relative;
+  overflow-x:hidden;
+  background:linear-gradient(150deg,#FF3D81 0%,#7C3AED 45%,#2563EB 100%);
+  background-attachment:fixed;
+}
+body::before,body::after{
+  content:'';position:fixed;border-radius:50%;filter:blur(60px);z-index:0;pointer-events:none;
+}
+body::before{width:280px;height:280px;background:rgba(255,200,87,0.55);top:-60px;inset-inline-end:-60px;}
+body::after{width:340px;height:340px;background:rgba(37,99,235,0.55);bottom:-100px;inset-inline-start:-80px;}
 html[lang="en"] body,html[lang="fr"] body,html[lang="es"] body{font-family:var(--font-lat);}
 h1,h2,h3{font-family:var(--font-d);}
 html[lang="en"] h1,html[lang="en"] h2,html[lang="en"] h3,
@@ -32,61 +44,62 @@ html[lang="es"] h1,html[lang="es"] h2,html[lang="es"] h3{font-family:var(--font-
 button{font-family:inherit;cursor:pointer;}
 input,select,textarea{font-family:inherit;}
 
-.topbar{padding:16px 18px;background:linear-gradient(180deg,#173538,var(--bg));border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.topbar{padding:16px 18px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:10;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
 .brand{display:flex;align-items:center;gap:10px;}
-.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(155deg,var(--accent-soft),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.logo{width:38px;height:38px;border-radius:14px;background:linear-gradient(155deg,var(--accent-soft),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 8px 20px rgba(255,61,129,0.55);}
 .brand-name{font-weight:800;font-size:18px;}
 .langbox select{
-  background:var(--surface);border:1px solid var(--line);color:var(--ink);
-  border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:700;
+  background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);color:var(--ink);
+  border-radius:11px;padding:7px 10px;font-size:12.5px;font-weight:700;
 }
 
-.hero{padding:34px 20px 26px;text-align:center;background:radial-gradient(120% 100% at 50% 0%, #1E4448 0%, var(--bg) 70%);}
-.hero h1{margin:0 0 8px;font-size:26px;font-weight:800;line-height:1.35;}
-.hero h1 span{color:var(--accent-soft);}
-.hero p{margin:0 auto;max-width:420px;font-size:14px;color:var(--ink-dim);line-height:1.7;}
+.hero{padding:36px 20px 28px;text-align:center;position:relative;z-index:1;}
+.hero h1{margin:0 0 8px;font-size:27px;font-weight:800;line-height:1.35;}
+.hero h1 span{color:var(--gold);}
+.hero p{margin:0 auto;max-width:420px;font-size:14px;color:rgba(255,255,255,0.85);line-height:1.7;}
 .feature-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
-.feature-chip{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--ink-dim);display:flex;align-items:center;gap:6px;}
+.feature-chip{background:rgba(255,255,255,0.16);border:2px solid rgba(255,255,255,0.25);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;}
 
-.wrap{max-width:600px;margin:0 auto;padding:0 16px 50px;}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:-8px;margin-bottom:16px;position:relative;}
-.section-title{font-size:14px;color:var(--accent-soft);font-weight:700;margin:2px 0 12px;display:flex;align-items:center;gap:6px;}
-label{display:block;font-size:12px;color:var(--ink-dim);margin:11px 0 5px;font-weight:700;}
+.wrap{max-width:600px;margin:0 auto;padding:0 16px 50px;position:relative;z-index:1;}
+.card{background:var(--card);border-inline-start:5px solid var(--accent);border-radius:24px;padding:20px;margin-top:-6px;margin-bottom:18px;position:relative;box-shadow:0 24px 50px rgba(0,0,0,0.4);}
+.section-title{font-size:14px;color:var(--gold);font-weight:800;margin:2px 0 14px;display:flex;align-items:center;gap:6px;}
+label{display:block;font-size:12px;color:var(--ink-dim);margin:13px 0 7px;font-weight:700;}
 input[type=text],select,textarea{
-  width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);
-  border-radius:10px;padding:10px 12px;font-size:14px;
+  width:100%;background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.14);color:var(--ink);
+  border-radius:13px;padding:11px 13px;font-size:14px;
 }
+select option{background:#1E1240;color:#fff;}
 textarea{min-height:80px;resize:vertical;}
 .row{display:flex;gap:10px;}
 .row>*{flex:1;}
 
-.tonegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px;}
-.tone-opt{padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink-dim);font-weight:700;font-size:12.5px;text-align:center;}
-.tone-opt.active{border-color:var(--accent);background:rgba(255,77,141,0.14);color:var(--accent-soft);}
+.tonegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:4px;}
+.tone-opt{padding:11px;border-radius:13px;border:2px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--ink-dim);font-weight:700;font-size:12.5px;text-align:center;transition:all .15s;}
+.tone-opt.active{border-color:var(--accent);background:linear-gradient(155deg,var(--accent-soft),var(--accent));color:#fff;box-shadow:0 8px 20px rgba(255,61,129,0.4);}
 
-.btn{border:none;border-radius:12px;padding:13px 18px;font-weight:800;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
-.btn-accent{background:linear-gradient(155deg,var(--accent-soft),var(--accent));color:#3A0018;}
+.btn{border:none;border-radius:15px;padding:14px 18px;font-weight:800;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.btn-accent{background:linear-gradient(120deg,var(--gold),var(--accent) 60%,#7C3AED);color:#fff;box-shadow:0 16px 34px rgba(255,61,129,0.5);}
 .btn-block{width:100%;}
 .btn:disabled{opacity:.55;pointer-events:none;}
-.btn-outline{background:transparent;border:1px solid var(--line);color:var(--ink);padding:8px 13px;font-size:12.5px;font-weight:700;border-radius:9px;}
-.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.25);border-top-color:#3A0018;border-radius:50%;animation:spin .7s linear infinite;}
+.btn-outline{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);color:var(--ink);padding:8px 13px;font-size:12.5px;font-weight:700;border-radius:11px;}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-.err{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.35);color:var(--danger);padding:10px 12px;border-radius:10px;font-size:12.5px;margin-top:12px;}
+.err{background:rgba(255,61,129,0.16);border:2px solid rgba(255,61,129,0.4);color:#FFD3E1;padding:10px 12px;border-radius:12px;font-size:12.5px;margin-top:12px;}
 
 .results{display:none;margin-top:6px;}
 .results.show{display:block;}
-.out-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;}
-.out-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:10px;}
+.out-card{background:var(--card);border-inline-start:5px solid var(--gold);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 18px 40px rgba(0,0,0,0.35);}
+.out-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;}
 .out-head h3{margin:0;font-size:13.5px;color:var(--gold);}
 .out-body{font-size:13.5px;line-height:1.85;white-space:pre-wrap;color:var(--ink);}
 .kw-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
-.kw{background:rgba(255,200,87,0.12);color:var(--gold);border:1px solid rgba(255,200,87,0.3);padding:4px 10px;border-radius:14px;font-size:11.5px;font-weight:700;}
+.kw{background:rgba(255,200,87,0.2);color:var(--gold);border:2px solid rgba(255,200,87,0.4);padding:4px 10px;border-radius:14px;font-size:11.5px;font-weight:700;}
 .bullets{margin:0;padding-inline-start:18px;}
 .bullets li{margin-bottom:6px;line-height:1.7;}
 .copied{color:var(--success)!important;}
 .hint{font-size:11.5px;color:var(--ink-dim);margin-top:6px;line-height:1.7;text-align:center;}
-.ad-image{width:100%;border-radius:12px;display:block;margin-top:12px;border:1px solid var(--line);}
+.ad-image{width:100%;border-radius:18px;display:block;margin-top:12px;box-shadow:0 16px 36px rgba(0,0,0,0.4);}
 .img-loading{font-size:12.5px;color:var(--ink-dim);text-align:center;margin-top:10px;}
 </style>
 </head>
@@ -94,7 +107,7 @@ textarea{min-height:80px;resize:vertical;}
 
 <div class="topbar">
   <div class="brand">
-    <div class="logo">📝</div>
+    <div class="logo" style="background:none;box-shadow:none;padding:0;overflow:hidden;"><img src="/logo.png" alt="وصّاف" style="width:100%;height:100%;object-fit:cover;"></div>
     <div class="brand-name">وصّاف</div>
   </div>
   <div class="langbox">
@@ -125,6 +138,12 @@ textarea{min-height:80px;resize:vertical;}
 </div>
 
 <div class="wrap" id="pageForm">
+  <button type="button" class="btn-outline" style="margin-bottom:10px;" onclick="toggleHistory()">📚 <span data-i18n="btnHistory"></span></button>
+  <div class="out-card" id="historyPanel" style="display:none;">
+    <div class="out-head"><h3 data-i18n="historyTitle"></h3><button class="btn-outline" onclick="clearHistory()" data-i18n="btnClearHistory"></button></div>
+    <div id="historyList"></div>
+  </div>
+
   <div class="card">
     <div class="section-title">📦 <span data-i18n="sectionProduct"></span></div>
 
@@ -147,6 +166,22 @@ textarea{min-height:80px;resize:vertical;}
       <span class="btn-label" data-i18n="btnGenerate"></span>
     </button>
     <div class="err" id="genErr" style="display:none;"></div>
+
+    <button type="button" class="btn-outline btn-block" style="margin-top:14px;" onclick="toggleCompare()">⚖️ <span data-i18n="btnCompareToggle"></span></button>
+    <div id="comparePanel" style="display:none;margin-top:10px;">
+      <div class="row">
+        <div>
+          <label data-i18n="compareToneA"></label>
+          <select id="compareToneASel"></select>
+        </div>
+        <div>
+          <label data-i18n="compareToneB"></label>
+          <select id="compareToneBSel"></select>
+        </div>
+      </div>
+      <button class="btn btn-accent btn-block" style="margin-top:12px;" onclick="runCompare()" id="compareBtn"><span data-i18n="btnRunCompare"></span></button>
+      <div id="compareResults" style="display:none;margin-top:12px;"></div>
+    </div>
   </div>
 
   <div class="out-card">
@@ -247,7 +282,7 @@ const translations = {
     labelFeatures:'المميزات الأساسية (افصل بينها بفاصلة)', placeholderFeatures:'مثال: مريح جدًا، مقاوم للماء، خفيف الوزن',
     labelAudience:'الجمهور المستهدف', placeholderAudience:'مثال: شباب رياضيين 20-35 سنة',
     labelTone:'نبرة الصوت',
-    tones:['حماسية','احترافية','فكاهية','فاخرة'],
+    tones:['حماسية','احترافية','فكاهية','فاخرة','مصري عامي 🇪🇬'],
     btnGenerate:'✨ توليد المحتوى', btnGenerating:'جاري التوليد...',
     errMissing:'اكتب اسم المنتج والمميزات على الأقل.',
     errPrefix:'حصل خطأ: ', errSuffix:' — حاول تاني.',
@@ -267,6 +302,9 @@ const translations = {
     btnAnalyze:'🔍 اقرأ من الصورة وولّد الإعلان', btnAnalyzing:'جاري القراءة والتوليد...',
     analyzeErrNoFile:'ارفعي صورة المنتج الأول.',
     btnSpeakAll:'اسمع كل حاجة',
+    btnHistory:'السجل', historyTitle:'📚 المنتجات السابقة', btnClearHistory:'امسح الكل',
+    historyEmpty:'لسه مفيش منتجات محفوظة.', btnLoad:'افتح',
+    btnCompareToggle:'قارن نبرتين', compareToneA:'النبرة الأولى', compareToneB:'النبرة الثانية', btnRunCompare:'⚖️ قارن دلوقتي',
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -301,6 +339,9 @@ const translations = {
     btnAnalyze:'🔍 Read the photo and generate the ad', btnAnalyzing:'Reading and generating...',
     analyzeErrNoFile:'Upload a product photo first.',
     btnSpeakAll:'Listen to everything',
+    btnHistory:'History', historyTitle:'📚 Previous products', btnClearHistory:'Clear all',
+    historyEmpty:'No saved products yet.', btnLoad:'Open',
+    btnCompareToggle:'Compare two tones', compareToneA:'First tone', compareToneB:'Second tone', btnRunCompare:'⚖️ Compare now',
     langName:'English'
   },
   fr: {
@@ -335,6 +376,9 @@ const translations = {
     btnAnalyze:'🔍 Lire la photo et générer la publicité', btnAnalyzing:'Lecture et génération...',
     analyzeErrNoFile:"Téléchargez d'abord une photo du produit.",
     btnSpeakAll:'Tout écouter',
+    btnHistory:'Historique', historyTitle:'📚 Produits précédents', btnClearHistory:'Tout effacer',
+    historyEmpty:'Aucun produit enregistré pour le moment.', btnLoad:'Ouvrir',
+    btnCompareToggle:'Comparer deux tons', compareToneA:'Premier ton', compareToneB:'Deuxième ton', btnRunCompare:'⚖️ Comparer maintenant',
     langName:'French'
   },
   es: {
@@ -369,6 +413,9 @@ const translations = {
     btnAnalyze:'🔍 Leer la foto y generar el anuncio', btnAnalyzing:'Leyendo y generando...',
     analyzeErrNoFile:'Sube primero una foto del producto.',
     btnSpeakAll:'Escuchar todo',
+    btnHistory:'Historial', historyTitle:'📚 Productos anteriores', btnClearHistory:'Borrar todo',
+    historyEmpty:'Aún no hay productos guardados.', btnLoad:'Abrir',
+    btnCompareToggle:'Comparar dos tonos', compareToneA:'Primer tono', compareToneB:'Segundo tono', btnRunCompare:'⚖️ Comparar ahora',
     langName:'Spanish'
   }
 };
@@ -426,8 +473,17 @@ function setLanguage(lang){
   catSel.innerHTML = t.categories.map((c,i)=>`<option value="${i}">${c}</option>`).join('');
   catSel.value = selectedCategoryIndex;
 
+  if(selectedToneIndex >= t.tones.length) selectedToneIndex = 0;
   const toneGrid = document.getElementById('toneGrid');
   toneGrid.innerHTML = t.tones.map((tone,i)=>`<button type="button" class="tone-opt${i===selectedToneIndex?' active':''}" data-idx="${i}" onclick="pickTone(${i})">${tone}</button>`).join('');
+
+  const cmpA = document.getElementById('compareToneASel');
+  const cmpB = document.getElementById('compareToneBSel');
+  if(cmpA && cmpB){
+    cmpA.innerHTML = t.tones.map((tone,i)=>`<option value="${i}">${tone}</option>`).join('');
+    cmpB.innerHTML = t.tones.map((tone,i)=>`<option value="${i}">${tone}</option>`).join('');
+    cmpA.value = 0; cmpB.value = t.tones.length > 1 ? 1 : 0;
+  }
 
   saveLang(lang);
 }
@@ -501,7 +557,12 @@ async function generateContent(){
   setLoading(true);
   document.getElementById('results').classList.remove('show');
   try{
-    const system = `You are an expert marketing copywriter specialized in e-commerce product content, writing entirely in ${t.langName}. Follow AIDA principles (Attention, Interest, Desire, Action) for ad copy.
+    const isEgyptianDialect = currentLang === 'ar' && selectedToneIndex === 4;
+    const langForPrompt = isEgyptianDialect
+      ? 'Egyptian Arabic colloquial dialect (masri, everyday spoken Arabic as used in Egypt, NOT formal Modern Standard Arabic)'
+      : t.langName;
+
+    const system = `You are an expert marketing copywriter specialized in e-commerce product content, writing entirely in ${langForPrompt}. Follow AIDA principles (Attention, Interest, Desire, Action) for ad copy.
 
 Respond using EXACTLY this format, with no extra commentary before or after, and no Markdown symbols like asterisks:
 
@@ -522,7 +583,7 @@ Respond using EXACTLY this format, with no extra commentary before or after, and
 [IMAGE_PROMPT]
 (a concise, purely visual, physical description of the product itself in English ONLY, 1-2 sentences, mentioning size, type, shape, color, and material whenever that information is known from the input. Do not mention the brand name or any text. Always write this section in English regardless of the requested content language. Example: "a 43 inch flat screen smart TV with thin black bezels, mounted on a stand")
 
-IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] [IMAGE_PROMPT] exactly as shown, in English. Write the content inside [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] entirely in ${t.langName}. Write the content inside [IMAGE_PROMPT] entirely in English, no matter what ${t.langName} is.`;
+IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] [IMAGE_PROMPT] exactly as shown, in English. Write the content inside [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] entirely in ${langForPrompt}. Write the content inside [IMAGE_PROMPT] entirely in English, no matter what ${langForPrompt} is.`;
 
     const user = `Product name: ${name}\nCategory: ${categoryText}\nKey features: ${features}\nTarget audience: ${audience || 'general'}\nTone of voice: ${toneText}`;
 
@@ -536,6 +597,15 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] [IM
     document.getElementById('fbOut').textContent = data.fbAd || '';
     document.getElementById('tiktokOut').textContent = data.tiktokAd || '';
     lastImagePrompt = data.imagePrompt || '';
+
+    saveHistoryEntry({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      dateLabel: new Date().toLocaleDateString(currentLang==='ar' ? 'ar-EG' : undefined),
+      name, categoryIndex: document.getElementById('pCategory').value, features, audience,
+      toneIndex: selectedToneIndex,
+      seoDescription: data.seoDescription, keywords: data.keywords, bulletPoints: data.bulletPoints,
+      fbAd: data.fbAd, tiktokAd: data.tiktokAd, imagePrompt: data.imagePrompt
+    });
 
     document.getElementById('results').classList.add('show');
     document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
@@ -696,6 +766,124 @@ function speakText(text){
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = langCodeMap[currentLang] || 'ar-SA';
   window.speechSynthesis.speak(utter);
+}
+
+const HISTORY_KEY = 'wassaf_history';
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){ return []; }
+}
+function saveHistoryEntry(entry){
+  const list = loadHistory();
+  list.unshift(entry);
+  if(list.length>20) list.length = 20;
+  try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+}
+function deleteHistoryEntry(id){
+  const list = loadHistory().filter(e=>e.id!==id);
+  try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+  renderHistory();
+}
+function clearHistory(){
+  try{ localStorage.removeItem(HISTORY_KEY); }catch(e){}
+  renderHistory();
+}
+function toggleHistory(){
+  const panel = document.getElementById('historyPanel');
+  const isHidden = panel.style.display === 'none' || !panel.style.display;
+  panel.style.display = isHidden ? 'block' : 'none';
+  if(isHidden) renderHistory();
+}
+function renderHistory(){
+  const t = translations[currentLang];
+  const list = loadHistory();
+  const wrap = document.getElementById('historyList');
+  if(list.length===0){
+    wrap.innerHTML = `<div class="hint">${t.historyEmpty}</div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(item=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.1);gap:8px;">
+      <div style="min-width:0;">
+        <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.name)}</div>
+        <div class="hint" style="margin:0;text-align:start;">${escapeHtml(item.dateLabel)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn-outline" onclick="loadHistoryEntry('${item.id}')">${t.btnLoad}</button>
+        <button class="btn-outline" onclick="deleteHistoryEntry('${item.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+function loadHistoryEntry(id){
+  const item = loadHistory().find(e=>e.id===id);
+  if(!item) return;
+  document.getElementById('pName').value = item.name;
+  document.getElementById('pFeatures').value = item.features;
+  document.getElementById('pAudience').value = item.audience;
+  document.getElementById('pCategory').value = item.categoryIndex;
+  selectedToneIndex = item.toneIndex;
+  pickTone(item.toneIndex);
+
+  document.getElementById('seoOut').textContent = item.seoDescription || '';
+  document.getElementById('kwWrap').innerHTML = (item.keywords||[]).map(k=>`<span class="kw">${escapeHtml(k)}</span>`).join('');
+  document.getElementById('bulletsOut').innerHTML = (item.bulletPoints||[]).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
+  document.getElementById('bulletsPlainHidden').textContent = (item.bulletPoints||[]).map(b=>'• '+b).join('\n');
+  document.getElementById('fbOut').textContent = item.fbAd || '';
+  document.getElementById('tiktokOut').textContent = item.tiktokAd || '';
+  lastImagePrompt = item.imagePrompt || '';
+  document.getElementById('results').classList.add('show');
+  document.getElementById('historyPanel').style.display = 'none';
+  document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function toggleCompare(){
+  const panel = document.getElementById('comparePanel');
+  panel.style.display = (panel.style.display === 'none' || !panel.style.display) ? 'block' : 'none';
+}
+async function runSingleForCompare(toneIdx, name, features, audience, categoryText, t){
+  const toneText = t.tones[toneIdx];
+  const isEgyptianDialect = currentLang === 'ar' && toneIdx === 4;
+  const langForPrompt = isEgyptianDialect
+    ? 'Egyptian Arabic colloquial dialect (masri, everyday spoken Arabic as used in Egypt, NOT formal Modern Standard Arabic)'
+    : t.langName;
+  const system = `You are an expert marketing copywriter. Write ONE short Facebook/Instagram ad paragraph (3-4 sentences) following AIDA principles, entirely in ${langForPrompt}. No markdown, no labels, just the ad text itself.`;
+  const user = `Product name: ${name}\nCategory: ${categoryText}\nKey features: ${features}\nTarget audience: ${audience || 'general'}\nTone of voice: ${toneText}`;
+  return await callClaude(system, user);
+}
+async function runCompare(){
+  const t = translations[currentLang];
+  const name = document.getElementById('pName').value.trim();
+  const features = document.getElementById('pFeatures').value.trim();
+  const audience = document.getElementById('pAudience').value.trim();
+  const categoryText = t.categories[document.getElementById('pCategory').value];
+  if(!name || !features){ showErr(t.errMissing); return; }
+
+  const idxA = parseInt(document.getElementById('compareToneASel').value,10);
+  const idxB = parseInt(document.getElementById('compareToneBSel').value,10);
+
+  const btn = document.getElementById('compareBtn');
+  btn.disabled = true;
+  const resultsEl = document.getElementById('compareResults');
+  resultsEl.innerHTML = `<div class="hint">${t.btnGenerating}</div>`;
+  resultsEl.style.display = 'block';
+
+  try{
+    const [resA, resB] = await Promise.all([idxA, idxB].map(idx => runSingleForCompare(idx, name, features, audience, categoryText, t)));
+    resultsEl.innerHTML = `
+      <div class="out-card">
+        <div class="out-head"><h3>${escapeHtml(t.tones[idxA])}</h3></div>
+        <div class="out-body">${escapeHtml(resA)}</div>
+      </div>
+      <div class="out-card">
+        <div class="out-head"><h3>${escapeHtml(t.tones[idxB])}</h3></div>
+        <div class="out-body">${escapeHtml(resB)}</div>
+      </div>
+    `;
+  }catch(e){
+    resultsEl.innerHTML = `<div class="err" style="display:block;">${t.errPrefix}${(e && e.message) || '?'}${t.errSuffix}</div>`;
+  }finally{
+    btn.disabled = false;
+  }
 }
 
 function switchPage(page){
