@@ -102,6 +102,17 @@ textarea{min-height:80px;resize:vertical;}
 .hint{font-size:11.5px;color:var(--ink-dim);margin-top:6px;line-height:1.7;text-align:center;}
 .ad-image{width:100%;border-radius:18px;display:block;margin-top:12px;box-shadow:0 16px 36px rgba(0,0,0,0.4);}
 .img-loading{font-size:12.5px;color:var(--ink-dim);text-align:center;margin-top:10px;}
+
+.auth-btn{background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);color:var(--ink);border-radius:11px;padding:7px 12px;font-size:12px;font-weight:700;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border-radius:22px;padding:22px;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative;}
+.modal-close{position:absolute;top:14px;inset-inline-end:14px;background:rgba(255,255,255,0.1);border:none;color:var(--ink);width:28px;height:28px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-title{font-size:16px;font-weight:800;color:var(--gold);margin:0 0 14px;}
+.auth-msg{font-size:12.5px;margin-top:10px;line-height:1.7;display:none;}
+.auth-msg.show{display:block;}
+.auth-msg.ok{color:var(--success);}
+.auth-msg.bad{color:#FFD3E1;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -112,13 +123,39 @@ textarea{min-height:80px;resize:vertical;}
     <div class="logo" style="background:none;box-shadow:none;padding:0;overflow:hidden;"><img src="/logo.png" alt="وصّاف" style="width:100%;height:100%;object-fit:cover;"></div>
     <div class="brand-name">وصّاف</div>
   </div>
-  <div class="langbox">
-    <select id="langSwitch" onchange="setLanguage(this.value)">
-      <option value="ar">🇪🇬 العربية</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="fr">🇫🇷 Français</option>
-      <option value="es">🇪🇸 Español</option>
-    </select>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button type="button" class="auth-btn" id="authBtn" onclick="onAuthBtnClick()">تسجيل دخول</button>
+    <div class="langbox">
+      <select id="langSwitch" onchange="setLanguage(this.value)">
+        <option value="ar">🇪🇬 العربية</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="es">🇪🇸 Español</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    <div class="modal-title">تسجيل الدخول</div>
+    <label>الإيميل</label>
+    <input type="text" id="authEmail" placeholder="example@email.com">
+    <label>كلمة السر</label>
+    <input type="text" id="authPassword" placeholder="على الأقل 6 حروف/أرقام">
+    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="handleSignIn()" id="signInBtn">دخول</button>
+    <button class="btn-outline btn-block" style="margin-top:10px;" onclick="handleSignUp()" id="signUpBtn">حساب جديد</button>
+    <div class="auth-msg" id="authMsg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="accountModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAccountModal()">✕</button>
+    <div class="modal-title">حسابك</div>
+    <div style="font-size:13.5px;color:var(--ink-dim);margin-bottom:16px;" id="accountEmailLabel"></div>
+    <button class="btn btn-accent btn-block" onclick="handleSignOut()">تسجيل خروج</button>
   </div>
 </div>
 
@@ -272,8 +309,81 @@ textarea{min-height:80px;resize:vertical;}
 
 <script>
 const SUPABASE_URL = 'https://sszbvoveeafekfvujhzp.supabase.co';
-const SUPABASE_KEY = 'ضعي_هنا_الـ_Publishable_Key_الكامل_اللي_نسختيه';
+const SUPABASE_KEY = 'sb_publishable_9lbrNqFsqrPw6Ll06p925A_mA3yLyBT';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+
+function openAuthModal(){
+  document.getElementById('authMsg').classList.remove('show');
+  document.getElementById('authModal').classList.add('show');
+}
+function closeAuthModal(){ document.getElementById('authModal').classList.remove('show'); }
+function openAccountModal(){
+  document.getElementById('accountEmailLabel').textContent = currentUser ? currentUser.email : '';
+  document.getElementById('accountModal').classList.add('show');
+}
+function closeAccountModal(){ document.getElementById('accountModal').classList.remove('show'); }
+
+function onAuthBtnClick(){
+  if(currentUser){ openAccountModal(); } else { openAuthModal(); }
+}
+
+function showAuthMsg(text, ok){
+  const el = document.getElementById('authMsg');
+  el.textContent = text;
+  el.classList.remove('ok','bad');
+  el.classList.add('show', ok ? 'ok' : 'bad');
+}
+
+function updateAuthButton(){
+  const btn = document.getElementById('authBtn');
+  if(currentUser){
+    btn.textContent = currentUser.email;
+  } else {
+    btn.textContent = 'تسجيل دخول';
+  }
+}
+
+async function handleSignUp(){
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if(!email || !password){ showAuthMsg('اكتبي الإيميل وكلمة السر.', false); return; }
+  const { data, error } = await supabaseClient.auth.signUp({ email, password });
+  if(error){ showAuthMsg('حصل خطأ: ' + error.message, false); return; }
+  showAuthMsg('اتعمل الحساب! ممكن يطلب منك تأكيد الإيميل الأول - افحصي بريدك.', true);
+}
+
+async function handleSignIn(){
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  if(!email || !password){ showAuthMsg('اكتبي الإيميل وكلمة السر.', false); return; }
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error){ showAuthMsg('حصل خطأ: ' + error.message, false); return; }
+  currentUser = data.user;
+  updateAuthButton();
+  closeAuthModal();
+}
+
+async function handleSignOut(){
+  await supabaseClient.auth.signOut();
+  currentUser = null;
+  updateAuthButton();
+  closeAccountModal();
+}
+
+async function initAuth(){
+  const { data } = await supabaseClient.auth.getSession();
+  if(data && data.session){
+    currentUser = data.session.user;
+    updateAuthButton();
+  }
+  supabaseClient.auth.onAuthStateChange((event, session)=>{
+    currentUser = session ? session.user : null;
+    updateAuthButton();
+  });
+}
+initAuth();
 
 const translations = {
   ar: {
