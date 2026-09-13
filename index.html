@@ -714,7 +714,7 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] [IM
     document.getElementById('tiktokOut').textContent = data.tiktokAd || '';
     lastImagePrompt = data.imagePrompt || '';
 
-    saveHistoryEntry({
+    await saveHistoryEntry({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
       dateLabel: new Date().toLocaleDateString(currentLang==='ar' ? 'ar-EG' : undefined),
       name, categoryIndex: document.getElementById('pCategory').value, features, audience,
@@ -884,23 +884,58 @@ function speakText(text){
   window.speechSynthesis.speak(utter);
 }
 
-const HISTORY_KEY = 'wassaf_history';
-function loadHistory(){
-  try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){ return []; }
+async function loadHistory(){
+  if(!currentUser) return [];
+  const { data, error } = await supabaseClient
+    .from('history')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
+  if(error){ console.error(error); return []; }
+  return (data||[]).map(row => ({
+    id: row.id,
+    dateLabel: row.date_label,
+    name: row.name,
+    categoryIndex: row.category_index,
+    features: row.features,
+    audience: row.audience,
+    toneIndex: row.tone_index,
+    seoDescription: row.seo_description,
+    keywords: row.keywords,
+    bulletPoints: row.bullet_points,
+    fbAd: row.fb_ad,
+    tiktokAd: row.tiktok_ad,
+    imagePrompt: row.image_prompt
+  }));
 }
-function saveHistoryEntry(entry){
-  const list = loadHistory();
-  list.unshift(entry);
-  if(list.length>20) list.length = 20;
-  try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+async function saveHistoryEntry(entry){
+  if(!currentUser) return;
+  const { error } = await supabaseClient.from('history').insert({
+    id: entry.id,
+    user_id: currentUser.id,
+    date_label: entry.dateLabel,
+    name: entry.name,
+    category_index: entry.categoryIndex,
+    features: entry.features,
+    audience: entry.audience,
+    tone_index: entry.toneIndex,
+    seo_description: entry.seoDescription,
+    keywords: entry.keywords,
+    bullet_points: entry.bulletPoints,
+    fb_ad: entry.fbAd,
+    tiktok_ad: entry.tiktokAd,
+    image_prompt: entry.imagePrompt
+  });
+  if(error) console.error(error);
 }
-function deleteHistoryEntry(id){
-  const list = loadHistory().filter(e=>e.id!==id);
-  try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+async function deleteHistoryEntry(id){
+  if(!currentUser) return;
+  await supabaseClient.from('history').delete().eq('id', id);
   renderHistory();
 }
-function clearHistory(){
-  try{ localStorage.removeItem(HISTORY_KEY); }catch(e){}
+async function clearHistory(){
+  if(!currentUser) return;
+  await supabaseClient.from('history').delete().eq('user_id', currentUser.id);
   renderHistory();
 }
 function toggleHistory(){
@@ -909,10 +944,15 @@ function toggleHistory(){
   panel.style.display = isHidden ? 'block' : 'none';
   if(isHidden) renderHistory();
 }
-function renderHistory(){
+async function renderHistory(){
   const t = translations[currentLang];
-  const list = loadHistory();
   const wrap = document.getElementById('historyList');
+  if(!currentUser){
+    wrap.innerHTML = `<div class="hint">سجّلي دخول الأول عشان تشوفي سجلك.</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="hint">جاري التحميل...</div>`;
+  const list = await loadHistory();
   if(list.length===0){
     wrap.innerHTML = `<div class="hint">${t.historyEmpty}</div>`;
     return;
@@ -930,8 +970,9 @@ function renderHistory(){
     </div>
   `).join('');
 }
-function loadHistoryEntry(id){
-  const item = loadHistory().find(e=>e.id===id);
+async function loadHistoryEntry(id){
+  const list = await loadHistory();
+  const item = list.find(e=>e.id===id);
   if(!item) return;
   document.getElementById('pName').value = item.name;
   document.getElementById('pFeatures').value = item.features;
