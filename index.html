@@ -124,7 +124,7 @@ textarea{min-height:80px;resize:vertical;}
     <div class="brand-name">وصّاف</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button type="button" class="auth-btn" id="authBtn" onclick="onAuthBtnClick()">تسجيل دخول</button>
+    <button type="button" class="auth-btn" id="authBtn" data-i18n="authBtnLogin" onclick="onAuthBtnClick()">تسجيل دخول</button>
     <div class="langbox">
       <select id="langSwitch" onchange="setLanguage(this.value)">
         <option value="ar">🇪🇬 العربية</option>
@@ -139,13 +139,13 @@ textarea{min-height:80px;resize:vertical;}
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeAuthModal()">✕</button>
-    <div class="modal-title">تسجيل الدخول</div>
-    <label>الإيميل</label>
+    <div class="modal-title" data-i18n="authModalTitle">تسجيل الدخول</div>
+    <label data-i18n="authEmailLabel">الإيميل</label>
     <input type="text" id="authEmail" placeholder="example@email.com">
-    <label>كلمة السر</label>
+    <label data-i18n="authPasswordLabel">كلمة السر</label>
     <input type="text" id="authPassword" placeholder="على الأقل 6 حروف/أرقام">
-    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="handleSignIn()" id="signInBtn">دخول</button>
-    <button class="btn-outline btn-block" style="margin-top:10px;" onclick="handleSignUp()" id="signUpBtn">حساب جديد</button>
+    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="handleSignIn()" id="signInBtn" data-i18n="authSignIn">دخول</button>
+    <button class="btn-outline btn-block" style="margin-top:10px;" onclick="handleSignUp()" id="signUpBtn" data-i18n="authSignUp">حساب جديد</button>
     <div class="auth-msg" id="authMsg"></div>
   </div>
 </div>
@@ -153,9 +153,9 @@ textarea{min-height:80px;resize:vertical;}
 <div class="modal-overlay" id="accountModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeAccountModal()">✕</button>
-    <div class="modal-title">حسابك</div>
+    <div class="modal-title" data-i18n="accountModalTitle">حسابك</div>
     <div style="font-size:13.5px;color:var(--ink-dim);margin-bottom:16px;" id="accountEmailLabel"></div>
-    <button class="btn btn-accent btn-block" onclick="handleSignOut()">تسجيل خروج</button>
+    <button class="btn btn-accent btn-block" onclick="handleSignOut()" data-i18n="accountSignOut">تسجيل خروج</button>
   </div>
 </div>
 
@@ -341,25 +341,27 @@ function updateAuthButton(){
   if(currentUser){
     btn.textContent = currentUser.email;
   } else {
-    btn.textContent = 'تسجيل دخول';
+    btn.textContent = translations[currentLang].authBtnLogin;
   }
 }
 
 async function handleSignUp(){
+  const t = translations[currentLang];
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
-  if(!email || !password){ showAuthMsg('اكتبي الإيميل وكلمة السر.', false); return; }
+  if(!email || !password){ showAuthMsg(t.authMsgMissing, false); return; }
   const { data, error } = await supabaseClient.auth.signUp({ email, password });
-  if(error){ showAuthMsg('حصل خطأ: ' + error.message, false); return; }
-  showAuthMsg('اتعمل الحساب! ممكن يطلب منك تأكيد الإيميل الأول - افحصي بريدك.', true);
+  if(error){ showAuthMsg(t.errPrefix + error.message, false); return; }
+  showAuthMsg(t.authMsgSignedUp, true);
 }
 
 async function handleSignIn(){
+  const t = translations[currentLang];
   const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
-  if(!email || !password){ showAuthMsg('اكتبي الإيميل وكلمة السر.', false); return; }
+  if(!email || !password){ showAuthMsg(t.authMsgMissing, false); return; }
   const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if(error){ showAuthMsg('حصل خطأ: ' + error.message, false); return; }
+  if(error){ showAuthMsg(t.errPrefix + error.message, false); return; }
   currentUser = data.user;
   updateAuthButton();
   closeAuthModal();
@@ -421,6 +423,10 @@ const translations = {
     btnHistory:'السجل', historyTitle:'📚 المنتجات السابقة', btnClearHistory:'امسح الكل',
     historyEmpty:'لسه مفيش منتجات محفوظة.', btnLoad:'افتح',
     btnCompareToggle:'قارن نبرتين', compareToneA:'النبرة الأولى', compareToneB:'النبرة الثانية', btnRunCompare:'⚖️ قارن دلوقتي',
+    authBtnLogin:'تسجيل دخول', authModalTitle:'تسجيل الدخول', authEmailLabel:'الإيميل', authPasswordLabel:'كلمة السر',
+    authSignIn:'دخول', authSignUp:'حساب جديد', accountModalTitle:'حسابك', accountSignOut:'تسجيل خروج',
+    authMsgMissing:'اكتبي الإيميل وكلمة السر.', authMsgSignedUp:'اتعمل الحساب! ممكن يطلب منك تأكيد الإيميل الأول - افحصي بريدك.',
+    historyLoginPrompt:'سجّلي دخول الأول عشان تشوفي سجلك.',
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -458,6 +464,10 @@ const translations = {
     btnHistory:'History', historyTitle:'📚 Previous products', btnClearHistory:'Clear all',
     historyEmpty:'No saved products yet.', btnLoad:'Open',
     btnCompareToggle:'Compare two tones', compareToneA:'First tone', compareToneB:'Second tone', btnRunCompare:'⚖️ Compare now',
+    authBtnLogin:'Sign in', authModalTitle:'Sign in', authEmailLabel:'Email', authPasswordLabel:'Password',
+    authSignIn:'Sign in', authSignUp:'Create account', accountModalTitle:'Your account', accountSignOut:'Sign out',
+    authMsgMissing:'Enter your email and password.', authMsgSignedUp:'Account created! You may need to confirm your email first — check your inbox.',
+    historyLoginPrompt:'Sign in first to see your history.',
     langName:'English'
   },
   fr: {
@@ -495,6 +505,10 @@ const translations = {
     btnHistory:'Historique', historyTitle:'📚 Produits précédents', btnClearHistory:'Tout effacer',
     historyEmpty:'Aucun produit enregistré pour le moment.', btnLoad:'Ouvrir',
     btnCompareToggle:'Comparer deux tons', compareToneA:'Premier ton', compareToneB:'Deuxième ton', btnRunCompare:'⚖️ Comparer maintenant',
+    authBtnLogin:'Se connecter', authModalTitle:'Connexion', authEmailLabel:'E-mail', authPasswordLabel:'Mot de passe',
+    authSignIn:'Connexion', authSignUp:'Créer un compte', accountModalTitle:'Votre compte', accountSignOut:'Déconnexion',
+    authMsgMissing:'Entrez votre e-mail et mot de passe.', authMsgSignedUp:"Compte créé ! Vous devrez peut-être confirmer votre e-mail — vérifiez votre boîte de réception.",
+    historyLoginPrompt:'Connectez-vous pour voir votre historique.',
     langName:'French'
   },
   es: {
@@ -532,6 +546,10 @@ const translations = {
     btnHistory:'Historial', historyTitle:'📚 Productos anteriores', btnClearHistory:'Borrar todo',
     historyEmpty:'Aún no hay productos guardados.', btnLoad:'Abrir',
     btnCompareToggle:'Comparar dos tonos', compareToneA:'Primer tono', compareToneB:'Segundo tono', btnRunCompare:'⚖️ Comparar ahora',
+    authBtnLogin:'Iniciar sesión', authModalTitle:'Iniciar sesión', authEmailLabel:'Correo electrónico', authPasswordLabel:'Contraseña',
+    authSignIn:'Iniciar sesión', authSignUp:'Crear cuenta', accountModalTitle:'Tu cuenta', accountSignOut:'Cerrar sesión',
+    authMsgMissing:'Ingresa tu correo y contraseña.', authMsgSignedUp:'¡Cuenta creada! Es posible que debas confirmar tu correo — revisa tu bandeja de entrada.',
+    historyLoginPrompt:'Inicia sesión para ver tu historial.',
     langName:'Spanish'
   }
 };
@@ -602,6 +620,7 @@ function setLanguage(lang){
   }
 
   saveLang(lang);
+  updateAuthButton();
 }
 function pickTone(idx){
   selectedToneIndex = idx;
@@ -948,7 +967,7 @@ async function renderHistory(){
   const t = translations[currentLang];
   const wrap = document.getElementById('historyList');
   if(!currentUser){
-    wrap.innerHTML = `<div class="hint">سجّلي دخول الأول عشان تشوفي سجلك.</div>`;
+    wrap.innerHTML = `<div class="hint">${t.historyLoginPrompt}</div>`;
     return;
   }
   wrap.innerHTML = `<div class="hint">جاري التحميل...</div>`;
