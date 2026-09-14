@@ -236,7 +236,9 @@ textarea{min-height:80px;resize:vertical;}
       <button type="button" class="tone-opt" id="imgTypeLogo" onclick="pickImageType('logo')" data-i18n="imgTypeLogo"></button>
     </div>
     <label data-i18n="imgUploadLabel" style="color:var(--gold);"></label>
-    <input type="file" accept="image/*" id="productPhoto" style="margin-bottom:12px;">
+    <input type="file" accept="image/*" id="productPhoto" style="display:none;" onchange="updateFileLabel(this,'productPhotoName')">
+    <button type="button" class="btn-outline btn-block" style="margin-bottom:6px;" onclick="document.getElementById('productPhoto').click()" data-i18n="btnChooseFile"></button>
+    <div class="hint" id="productPhotoName" style="margin-bottom:10px;"></div>
     <button class="btn btn-accent btn-block" onclick="generateImage()" id="imgBtn"><span data-i18n="btnGenImage"></span></button>
     <div class="img-loading" id="imgLoading" style="display:none;"></div>
     <img class="ad-image" id="adImage" style="display:none;">
@@ -274,7 +276,9 @@ textarea{min-height:80px;resize:vertical;}
   <div class="card">
     <div class="section-title" data-i18n="photoSectionTitle"></div>
     <label data-i18n="photoUploadLabel"></label>
-    <input type="file" accept="image/*" id="photoOnlyInput">
+    <input type="file" accept="image/*" id="photoOnlyInput" style="display:none;" onchange="updateFileLabel(this,'photoOnlyInputName')">
+    <button type="button" class="btn-outline btn-block" onclick="document.getElementById('photoOnlyInput').click()" data-i18n="btnChooseFile"></button>
+    <div class="hint" id="photoOnlyInputName"></div>
     <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="analyzeFromPhoto()" id="analyzeBtn">
       <span class="btn-label" id="analyzeBtnLabel" data-i18n="btnAnalyze"></span>
     </button>
@@ -420,6 +424,7 @@ const translations = {
     btnGenImage:'توليد صورة ✨',
     imgLoadingText:'جاري توليد الصورة... (بتاخد كذا ثانية)',
     imgBgRemovalText:'جاري شيل الخلفية وتجهيز صورة الاستوديو... (أول مرة ممكن تاخد دقيقة عشان بيحمّل البرنامج)',
+    btnChooseFile:'📁 اختاري صورة', noFileChosen:'مفيش صورة مختارة',
     imgTimeoutText:'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.',
     imgErrText:'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.',
     photoSectionTitle:'📸 ارفعي صورة المنتج بس',
@@ -465,6 +470,7 @@ const translations = {
     btnGenImage:'Generate image ✨',
     imgLoadingText:'Generating image... (may take a few seconds)',
     imgBgRemovalText:'Removing the background and building the studio shot... (first time may take about a minute to load)',
+    btnChooseFile:'📁 Choose photo', noFileChosen:'No photo chosen',
     imgTimeoutText:'This is taking longer than expected — try again in a bit if it does not finish.',
     imgErrText:'Something went wrong generating the image, try again in a few seconds.',
     photoSectionTitle:'📸 Just upload a product photo',
@@ -510,6 +516,7 @@ const translations = {
     btnGenImage:'Générer une image ✨',
     imgLoadingText:"Génération de l'image... (quelques secondes)",
     imgBgRemovalText:"Suppression de l'arrière-plan et création du visuel studio... (peut prendre environ une minute la première fois)",
+    btnChooseFile:'📁 Choisir une photo', noFileChosen:'Aucune photo choisie',
     imgTimeoutText:'Cela prend plus de temps que prévu — réessayez dans un instant si rien ne se passe.',
     imgErrText:"Une erreur est survenue lors de la génération de l'image, réessayez dans quelques secondes.",
     photoSectionTitle:'📸 Téléchargez simplement une photo du produit',
@@ -555,6 +562,7 @@ const translations = {
     btnGenImage:'Generar imagen ✨',
     imgLoadingText:'Generando imagen... (unos segundos)',
     imgBgRemovalText:'Quitando el fondo y creando la foto de estudio... (la primera vez puede tardar un minuto en cargar)',
+    btnChooseFile:'📁 Elegir foto', noFileChosen:'Ninguna foto elegida',
     imgTimeoutText:'Esto está tardando más de lo esperado — inténtalo de nuevo en un momento si no termina.',
     imgErrText:'Ocurrió un error al generar la imagen, inténtalo de nuevo en unos segundos.',
     photoSectionTitle:'📸 Solo sube una foto del producto',
@@ -592,6 +600,12 @@ function pickImageType(type){
   selectedImageType = type;
   document.getElementById('imgTypeAd').classList.toggle('active', type==='ad');
   document.getElementById('imgTypeLogo').classList.toggle('active', type==='logo');
+}
+
+function updateFileLabel(inputEl, labelId){
+  const label = document.getElementById(labelId);
+  const t = translations[currentLang];
+  label.textContent = (inputEl.files && inputEl.files[0]) ? inputEl.files[0].name : t.noFileChosen;
 }
 
 async function saveLang(lang){
@@ -643,6 +657,8 @@ function setLanguage(lang){
 
   saveLang(lang);
   updateAuthButton();
+  updateFileLabel(document.getElementById('productPhoto'), 'productPhotoName');
+  updateFileLabel(document.getElementById('photoOnlyInput'), 'photoOnlyInputName');
 }
 function pickTone(idx){
   selectedToneIndex = idx;
