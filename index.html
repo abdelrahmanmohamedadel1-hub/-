@@ -416,9 +416,10 @@ const translations = {
     footerHint:'راجع النصوص وعدّل عليها بلمستك قبل النشر.',
     tabForm:'✍️ اكتب البيانات', tabPhoto:'📸 من صورة بس',
     imgCardTitle:'🎨 صورة للإعلان', imgTypeAd:'صورة إعلان للمنتج', imgTypeLogo:'لوجو للمنتج',
-    imgUploadLabel:'⭐ لأفضل نتيجة احترافية، ارفعي صورة حقيقية للمنتج هنا (لو متاحة) - الذكاء الاصطناعي هيحسّنها بدل ما يتخيل شكل عام',
+    imgUploadLabel:'⭐ ارفعي صورة حقيقية للمنتج (اختياري) - هنشيل الخلفية ونحط خلفية استوديو حواليه، مع الحفاظ على شكل منتجك الحقيقي بالظبط',
     btnGenImage:'توليد صورة ✨',
     imgLoadingText:'جاري توليد الصورة... (بتاخد كذا ثانية)',
+    imgBgRemovalText:'جاري شيل الخلفية وتجهيز صورة الاستوديو... (أول مرة ممكن تاخد دقيقة عشان بيحمّل البرنامج)',
     imgTimeoutText:'الطلب باخد وقت أطول من المتوقع، لو معملتيش refresh حاولي تاني بعد شوية.',
     imgErrText:'حصل خطأ في توليد الصورة، حاول تاني بعد ثواني.',
     photoSectionTitle:'📸 ارفعي صورة المنتج بس',
@@ -460,9 +461,10 @@ const translations = {
     footerHint:'Review and personalize the text before publishing.',
     tabForm:'✍️ Enter details', tabPhoto:'📸 Photo only',
     imgCardTitle:'🎨 Ad image', imgTypeAd:'Product ad image', imgTypeLogo:'Product logo',
-    imgUploadLabel:'⭐ For the most professional result, upload a real product photo here if you have one — the AI will enhance it instead of imagining a generic look',
+    imgUploadLabel:"⭐ Upload a real product photo (optional) — we'll remove the background and place a clean studio backdrop behind it, keeping your product exactly as it is",
     btnGenImage:'Generate image ✨',
     imgLoadingText:'Generating image... (may take a few seconds)',
+    imgBgRemovalText:'Removing the background and building the studio shot... (first time may take about a minute to load)',
     imgTimeoutText:'This is taking longer than expected — try again in a bit if it does not finish.',
     imgErrText:'Something went wrong generating the image, try again in a few seconds.',
     photoSectionTitle:'📸 Just upload a product photo',
@@ -504,9 +506,10 @@ const translations = {
     footerHint:'Relisez et personnalisez le texte avant publication.',
     tabForm:'✍️ Saisir les détails', tabPhoto:'📸 Photo uniquement',
     imgCardTitle:'🎨 Image publicitaire', imgTypeAd:'Photo publicitaire du produit', imgTypeLogo:'Logo du produit',
-    imgUploadLabel:"⭐ Pour un résultat vraiment professionnel, ajoutez une photo réelle du produit ici si possible — l'IA l'améliorera au lieu d'imaginer un rendu générique",
+    imgUploadLabel:"⭐ Ajoutez une photo réelle du produit (facultatif) — nous retirons l'arrière-plan et ajoutons un décor de studio, en gardant votre produit exactement tel quel",
     btnGenImage:'Générer une image ✨',
     imgLoadingText:"Génération de l'image... (quelques secondes)",
+    imgBgRemovalText:"Suppression de l'arrière-plan et création du visuel studio... (peut prendre environ une minute la première fois)",
     imgTimeoutText:'Cela prend plus de temps que prévu — réessayez dans un instant si rien ne se passe.',
     imgErrText:"Une erreur est survenue lors de la génération de l'image, réessayez dans quelques secondes.",
     photoSectionTitle:'📸 Téléchargez simplement une photo du produit',
@@ -548,9 +551,10 @@ const translations = {
     footerHint:'Revisa y personaliza el texto antes de publicarlo.',
     tabForm:'✍️ Escribir datos', tabPhoto:'📸 Solo foto',
     imgCardTitle:'🎨 Imagen publicitaria', imgTypeAd:'Foto publicitaria del producto', imgTypeLogo:'Logo del producto',
-    imgUploadLabel:'⭐ Para el resultado más profesional, sube aquí una foto real del producto si la tienes — la IA la mejorará en lugar de imaginar un aspecto genérico',
+    imgUploadLabel:'⭐ Sube una foto real del producto (opcional) — quitaremos el fondo y pondremos un fondo de estudio, manteniendo tu producto exactamente igual',
     btnGenImage:'Generar imagen ✨',
     imgLoadingText:'Generando imagen... (unos segundos)',
+    imgBgRemovalText:'Quitando el fondo y creando la foto de estudio... (la primera vez puede tardar un minuto en cargar)',
     imgTimeoutText:'Esto está tardando más de lo esperado — inténtalo de nuevo en un momento si no termina.',
     imgErrText:'Ocurrió un error al generar la imagen, inténtalo de nuevo en unos segundos.',
     photoSectionTitle:'📸 Solo sube una foto del producto',
@@ -657,7 +661,7 @@ function escapeHtml(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,
 
 function parseSections(text){
   const grab = (tag) => {
-    const re = new RegExp('\\['+tag+'\\]([\\s\\S]*?)(?=\\n?\\[[A-Z]+\\]|$)');
+    const re = new RegExp('\\['+tag+'\\]([\\s\\S]*?)(?=\\n?\\[[A-Z_]+\\]|$)');
     const m = text.match(re);
     return m ? m[1].trim() : '';
   };
@@ -800,6 +804,82 @@ function compositeLogoText(imageUrl, text){
   });
 }
 
+let bgRemovalModulePromise = null;
+function loadBgRemovalModule(){
+  if(!bgRemovalModulePromise){
+    bgRemovalModulePromise = import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/browser.mjs');
+  }
+  return bgRemovalModulePromise;
+}
+function loadImageEl(src){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = ()=>resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+async function removeBgFromFile(file){
+  const mod = await loadBgRemovalModule();
+  const removeBackground = mod.default || mod.removeBackground;
+  const cutoutBlob = await removeBackground(file);
+  return URL.createObjectURL(cutoutBlob);
+}
+async function makeStudioAdFromFile(file){
+  const cutoutUrl = await removeBgFromFile(file);
+  const cutoutImg = await loadImageEl(cutoutUrl);
+
+  const W = 1024, H = 1024;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createRadialGradient(W/2, H*0.35, 40, W/2, H/2, W*0.75);
+  grad.addColorStop(0, '#ffffff');
+  grad.addColorStop(1, '#dde2ea');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  const scale = Math.min((W*0.7)/cutoutImg.width, (H*0.7)/cutoutImg.height);
+  const dw = cutoutImg.width * scale;
+  const dh = cutoutImg.height * scale;
+  const dx = (W - dw) / 2;
+  const dy = (H - dh) / 2 - H*0.03;
+
+  ctx.save();
+  ctx.filter = 'blur(20px)';
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(W/2, dy + dh + 6, dw*0.32, dh*0.07, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.filter = 'contrast(1.08) brightness(1.04) saturate(1.05)';
+  ctx.drawImage(cutoutImg, dx, dy, dw, dh);
+  ctx.filter = 'none';
+
+  return canvas.toDataURL('image/png');
+}
+async function makeLogoBaseFromFile(file){
+  const cutoutUrl = await removeBgFromFile(file);
+  const cutoutImg = await loadImageEl(cutoutUrl);
+
+  const W = 800, H = 800;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  const scale = Math.min((W*0.72)/cutoutImg.width, (H*0.72)/cutoutImg.height);
+  const dw = cutoutImg.width * scale;
+  const dh = cutoutImg.height * scale;
+  ctx.drawImage(cutoutImg, (W-dw)/2, (H-dh)/2, dw, dh);
+
+  return canvas.toDataURL('image/png');
+}
+
 function resizeImageFile(file, maxDim){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
@@ -836,28 +916,13 @@ async function generateImage(){
   btn.disabled = true;
   img.style.display = 'none';
   loadingEl.style.display = 'block';
-  loadingEl.textContent = translations[currentLang].imgLoadingText;
 
   if(file){
+    loadingEl.textContent = translations[currentLang].imgBgRemovalText;
     try{
-      const base64 = await resizeImageFile(file, 1024);
-      const editPrompt = selectedImageType === 'logo'
-        ? `redesign this into a flat 2D vector icon logo mark, app icon style, NOT a photograph, NOT realistic, simple geometric silhouette inspired by this product's shape, minimalist line art, bold vibrant colors, 2-3 colors maximum, isolated on plain solid background, flat illustration, graphic design asset, no photography, no 3d render, no scene, no shadows, no text, no words, no letters, no writing`
-        : `turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic`;
-
-      const response = await fetch('/api/generate-image-edit', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ image: base64, prompt: editPrompt })
-      });
-
-      if(!response.ok){
-        const errData = await response.json().catch(()=>({}));
-        throw new Error(errData.error || 'edit failed');
-      }
-
-      const blob = await response.blob();
-      let finalUrl = URL.createObjectURL(blob);
+      let finalUrl = selectedImageType === 'logo'
+        ? await makeLogoBaseFromFile(file)
+        : await makeStudioAdFromFile(file);
       if(selectedImageType === 'logo' && name){
         try{ finalUrl = await compositeLogoText(finalUrl, name); }catch(e){}
       }
@@ -866,11 +931,14 @@ async function generateImage(){
       loadingEl.style.display = 'none';
       btn.disabled = false;
     }catch(e){
+      console.error(e);
       loadingEl.textContent = translations[currentLang].imgErrText;
       btn.disabled = false;
     }
     return;
   }
+
+  loadingEl.textContent = translations[currentLang].imgLoadingText;
 
   const prompt = selectedImageType === 'logo'
     ? `flat 2D vector icon logo mark, app icon style, NOT a photograph, NOT realistic, simple geometric shape, single bold silhouette icon representing a ${categoriesEn[document.getElementById('pCategory').value]} brand, minimalist line art, 2 colors maximum, isolated on plain solid white background, flat illustration, graphic design asset, no photography, no 3d render, no scene, no room, no shadows, no text, no words, no letters, no writing`
@@ -1225,18 +1293,15 @@ async function analyzeFromPhoto(){
     document.getElementById('photoResults').classList.add('show');
     document.getElementById('photoResults').scrollIntoView({behavior:'smooth', block:'start'});
 
-    const editRes = await fetch('/api/generate-image-edit', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ image: base64, prompt: 'turn this into a professional product advertisement photo, studio lighting, clean elegant background, high quality marketing photography, keep the product itself unchanged and realistic' })
-    });
-    if(!editRes.ok){
-      imgLoading.textContent = t.imgErrText;
-    } else {
-      const blob = await editRes.blob();
-      imgOut.src = URL.createObjectURL(blob);
+    imgLoading.textContent = t.imgBgRemovalText;
+    try{
+      const studioUrl = await makeStudioAdFromFile(file);
+      imgOut.src = studioUrl;
       imgOut.style.display = 'block';
       imgLoading.style.display = 'none';
+    }catch(e){
+      console.error(e);
+      imgLoading.textContent = t.imgErrText;
     }
 
   }catch(e){
