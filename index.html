@@ -183,6 +183,12 @@ textarea{min-height:80px;resize:vertical;}
     <div id="historyList"></div>
   </div>
 
+  <button type="button" class="btn-outline" style="margin-bottom:10px;margin-inline-start:8px;" onclick="toggleBrandKits()">🎨 <span data-i18n="btnBrandKits"></span></button>
+  <div class="out-card" id="brandKitPanel" style="display:none;">
+    <div class="out-head"><h3 data-i18n="brandKitTitle"></h3><button class="btn-outline" onclick="saveCurrentAsBrandKit()" data-i18n="btnSaveBrandKit"></button></div>
+    <div id="brandKitList"></div>
+  </div>
+
   <div class="card">
     <div class="section-title">📦 <span data-i18n="sectionProduct"></span></div>
 
@@ -427,6 +433,9 @@ const translations = {
     authSignIn:'دخول', authSignUp:'حساب جديد', accountModalTitle:'حسابك', accountSignOut:'تسجيل خروج',
     authMsgMissing:'اكتبي الإيميل وكلمة السر.', authMsgSignedUp:'اتعمل الحساب! ممكن يطلب منك تأكيد الإيميل الأول - افحصي بريدك.',
     historyLoginPrompt:'سجّلي دخول الأول عشان تشوفي سجلك.',
+    btnBrandKits:'الهويات المحفوظة', brandKitTitle:'🎨 هويات المنتجات المحفوظة', btnSaveBrandKit:'+ احفظ الحالية',
+    brandKitEmpty:'لسه مفيش هويات محفوظة. املي بيانات المنتج واحفظيها.', brandKitNamePrompt:'اكتبي اسم مختصر للهوية دي (مثلاً: حذاء الجري)',
+    brandKitLoginPrompt:'سجّلي دخول الأول عشان تحفظي الهويات.', btnUseBrandKit:'استخدم', brandKitSaved:'اتحفظت الهوية!',
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -468,6 +477,9 @@ const translations = {
     authSignIn:'Sign in', authSignUp:'Create account', accountModalTitle:'Your account', accountSignOut:'Sign out',
     authMsgMissing:'Enter your email and password.', authMsgSignedUp:'Account created! You may need to confirm your email first — check your inbox.',
     historyLoginPrompt:'Sign in first to see your history.',
+    btnBrandKits:'Brand kits', brandKitTitle:'🎨 Saved brand kits', btnSaveBrandKit:'+ Save current',
+    brandKitEmpty:'No brand kits saved yet. Fill in product details and save them.', brandKitNamePrompt:'Name this brand kit (e.g. Running shoe)',
+    brandKitLoginPrompt:'Sign in first to save brand kits.', btnUseBrandKit:'Use', brandKitSaved:'Brand kit saved!',
     langName:'English'
   },
   fr: {
@@ -509,6 +521,9 @@ const translations = {
     authSignIn:'Connexion', authSignUp:'Créer un compte', accountModalTitle:'Votre compte', accountSignOut:'Déconnexion',
     authMsgMissing:'Entrez votre e-mail et mot de passe.', authMsgSignedUp:"Compte créé ! Vous devrez peut-être confirmer votre e-mail — vérifiez votre boîte de réception.",
     historyLoginPrompt:'Connectez-vous pour voir votre historique.',
+    btnBrandKits:'Kits de marque', brandKitTitle:'🎨 Kits de marque enregistrés', btnSaveBrandKit:'+ Enregistrer',
+    brandKitEmpty:"Aucun kit de marque enregistré. Remplissez les détails du produit et enregistrez-les.", brandKitNamePrompt:'Nommez ce kit de marque (ex: Chaussure de course)',
+    brandKitLoginPrompt:'Connectez-vous pour enregistrer des kits de marque.', btnUseBrandKit:'Utiliser', brandKitSaved:'Kit de marque enregistré !',
     langName:'French'
   },
   es: {
@@ -550,6 +565,9 @@ const translations = {
     authSignIn:'Iniciar sesión', authSignUp:'Crear cuenta', accountModalTitle:'Tu cuenta', accountSignOut:'Cerrar sesión',
     authMsgMissing:'Ingresa tu correo y contraseña.', authMsgSignedUp:'¡Cuenta creada! Es posible que debas confirmar tu correo — revisa tu bandeja de entrada.',
     historyLoginPrompt:'Inicia sesión para ver tu historial.',
+    btnBrandKits:'Kits de marca', brandKitTitle:'🎨 Kits de marca guardados', btnSaveBrandKit:'+ Guardar actual',
+    brandKitEmpty:'Aún no hay kits de marca guardados. Completa los datos del producto y guárdalos.', brandKitNamePrompt:'Nombra este kit de marca (ej: Zapatilla de running)',
+    brandKitLoginPrompt:'Inicia sesión para guardar kits de marca.', btnUseBrandKit:'Usar', brandKitSaved:'¡Kit de marca guardado!',
     langName:'Spanish'
   }
 };
@@ -1010,6 +1028,96 @@ async function loadHistoryEntry(id){
   document.getElementById('results').classList.add('show');
   document.getElementById('historyPanel').style.display = 'none';
   document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function toggleBrandKits(){
+  const panel = document.getElementById('brandKitPanel');
+  const isHidden = panel.style.display === 'none' || !panel.style.display;
+  panel.style.display = isHidden ? 'block' : 'none';
+  if(isHidden) renderBrandKits();
+}
+async function loadBrandKits(){
+  if(!currentUser) return [];
+  const { data, error } = await supabaseClient
+    .from('brand_kits')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if(error){ console.error(error); return []; }
+  return (data||[]).map(row => ({
+    id: row.id,
+    kitName: row.kit_name,
+    name: row.product_name,
+    categoryIndex: row.category_index,
+    features: row.features,
+    audience: row.audience,
+    toneIndex: row.default_tone_index
+  }));
+}
+async function saveCurrentAsBrandKit(){
+  const t = translations[currentLang];
+  if(!currentUser){ alert(t.brandKitLoginPrompt); return; }
+  const name = document.getElementById('pName').value.trim();
+  const features = document.getElementById('pFeatures').value.trim();
+  const audience = document.getElementById('pAudience').value.trim();
+  if(!name || !features){ alert(t.errMissing); return; }
+  const kitName = window.prompt(t.brandKitNamePrompt, name);
+  if(!kitName) return;
+  const { error } = await supabaseClient.from('brand_kits').insert({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    user_id: currentUser.id,
+    kit_name: kitName,
+    product_name: name,
+    category_index: document.getElementById('pCategory').value,
+    features: features,
+    audience: audience,
+    default_tone_index: selectedToneIndex
+  });
+  if(error){ console.error(error); return; }
+  alert(t.brandKitSaved);
+  renderBrandKits();
+}
+async function deleteBrandKit(id){
+  if(!currentUser) return;
+  await supabaseClient.from('brand_kits').delete().eq('id', id);
+  renderBrandKits();
+}
+async function useBrandKit(id){
+  const list = await loadBrandKits();
+  const kit = list.find(k=>k.id===id);
+  if(!kit) return;
+  document.getElementById('pName').value = kit.name;
+  document.getElementById('pFeatures').value = kit.features;
+  document.getElementById('pAudience').value = kit.audience;
+  document.getElementById('pCategory').value = kit.categoryIndex;
+  selectedToneIndex = kit.toneIndex;
+  pickTone(kit.toneIndex);
+  document.getElementById('brandKitPanel').style.display = 'none';
+}
+async function renderBrandKits(){
+  const t = translations[currentLang];
+  const wrap = document.getElementById('brandKitList');
+  if(!currentUser){
+    wrap.innerHTML = `<div class="hint">${t.brandKitLoginPrompt}</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="hint">...</div>`;
+  const list = await loadBrandKits();
+  if(list.length===0){
+    wrap.innerHTML = `<div class="hint">${t.brandKitEmpty}</div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(item=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.1);gap:8px;">
+      <div style="min-width:0;">
+        <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.kitName)}</div>
+        <div class="hint" style="margin:0;text-align:start;">${escapeHtml(item.name)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn-outline" onclick="useBrandKit('${item.id}')">${t.btnUseBrandKit}</button>
+        <button class="btn-outline" onclick="deleteBrandKit('${item.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 function toggleCompare(){
