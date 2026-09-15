@@ -173,6 +173,7 @@ textarea{min-height:80px;resize:vertical;}
   <div style="display:flex;gap:8px;margin-top:-8px;margin-bottom:14px;">
     <button type="button" class="tone-opt active" id="pageTabForm" onclick="switchPage('form')" style="flex:1;" data-i18n="tabForm"></button>
     <button type="button" class="tone-opt" id="pageTabPhoto" onclick="switchPage('photo')" style="flex:1;" data-i18n="tabPhoto"></button>
+    <button type="button" class="tone-opt" id="pageTabPricing" onclick="switchPage('pricing')" style="flex:1;" data-i18n="tabPricing"></button>
   </div>
 </div>
 
@@ -317,6 +318,25 @@ textarea{min-height:80px;resize:vertical;}
   </div>
 </div>
 
+<div class="wrap" id="pagePricing" style="display:none;">
+  <div class="card" style="text-align:center;">
+    <div class="section-title" style="justify-content:center;" data-i18n="pricingTitle"></div>
+    <p style="color:var(--ink-dim);font-size:13.5px;line-height:1.8;margin:0 0 18px;" data-i18n="pricingSubtitle"></p>
+
+    <div style="font-size:40px;font-weight:800;color:var(--gold);margin:8px 0 2px;" id="pricingAmount">...</div>
+    <div class="hint" style="margin:0 0 18px;" data-i18n="pricingPerMonth"></div>
+
+    <ul class="bullets" style="text-align:start;display:inline-block;margin:0 auto 20px;">
+      <li data-i18n="pricingFeature1"></li>
+      <li data-i18n="pricingFeature2"></li>
+      <li data-i18n="pricingFeature3"></li>
+    </ul>
+
+    <button class="btn btn-accent btn-block" onclick="handleSubscribeClick()" id="subscribeBtn" data-i18n="btnSubscribe"></button>
+    <div class="hint" id="subscribeMsg" style="display:none;margin-top:10px;"></div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://sszbvoveeafekfvujhzp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_9lbrNqFsqrPw6Ll06p925A_mA3yLyBT';
@@ -418,7 +438,11 @@ const translations = {
     outFbTitle:'📘 إعلان Facebook / Instagram', outTiktokTitle:'🎵 إعلان TikTok',
     btnCopy:'نسخ', btnCopied:'اتنسخ ✓',
     footerHint:'راجع النصوص وعدّل عليها بلمستك قبل النشر.',
-    tabForm:'✍️ اكتب البيانات', tabPhoto:'📸 من صورة بس',
+    tabForm:'✍️ اكتب البيانات', tabPhoto:'📸 من صورة بس', tabPricing:'💳 الاشتراك',
+    pricingTitle:'💳 اشتراك وصّاف الشهري', pricingSubtitle:'وصول كامل لكل مميزات الموقع، شهر بشهر، من غير أي التزام طويل.',
+    pricingPerMonth:'شهريًا', pricingFeature1:'✅ توليد وصف SEO ونقاط بيع بلا حدود', pricingFeature2:'✅ إعلانات فيسبوك وتيك توك بكل اللغات', pricingFeature3:'✅ توليد صور وشعارات للمنتج',
+    btnSubscribe:'اشتركي دلوقتي', subscribeNotReady:'الدفع لسه بيتظبط وهيبقى متاح قريب جدًا - تابعينا!',
+    subscribeLoginPrompt:'سجّلي دخول الأول عشان تشتركي.', subscribeError:'حصل خطأ، حاولي تاني كمان شوية.',
     imgCardTitle:'🎨 صورة للإعلان', imgTypeAd:'صورة إعلان للمنتج', imgTypeLogo:'لوجو للمنتج',
     imgUploadLabel:'⭐ ارفعي صورة حقيقية للمنتج (اختياري) - هنشيل الخلفية ونحط خلفية استوديو حواليه، مع الحفاظ على شكل منتجك الحقيقي بالظبط',
     btnGenImage:'توليد صورة ✨',
@@ -464,7 +488,11 @@ const translations = {
     outFbTitle:'📘 Facebook / Instagram ad', outTiktokTitle:'🎵 TikTok ad',
     btnCopy:'Copy', btnCopied:'Copied ✓',
     footerHint:'Review and personalize the text before publishing.',
-    tabForm:'✍️ Enter details', tabPhoto:'📸 Photo only',
+    tabForm:'✍️ Enter details', tabPhoto:'📸 Photo only', tabPricing:'💳 Subscribe',
+    pricingTitle:'💳 Wassaf monthly subscription', pricingSubtitle:'Full access to every feature on the site, month to month, no long commitment.',
+    pricingPerMonth:'per month', pricingFeature1:'✅ Unlimited SEO descriptions and selling points', pricingFeature2:'✅ Facebook and TikTok ads in every language', pricingFeature3:'✅ Product images and logo generation',
+    btnSubscribe:'Subscribe now', subscribeNotReady:'Payments are still being set up and will be available very soon — stay tuned!',
+    subscribeLoginPrompt:'Sign in first to subscribe.', subscribeError:'Something went wrong, try again in a bit.',
     imgCardTitle:'🎨 Ad image', imgTypeAd:'Product ad image', imgTypeLogo:'Product logo',
     imgUploadLabel:"⭐ Upload a real product photo (optional) — we'll remove the background and place a clean studio backdrop behind it, keeping your product exactly as it is",
     btnGenImage:'Generate image ✨',
@@ -510,7 +538,11 @@ const translations = {
     outFbTitle:'📘 Publicité Facebook / Instagram', outTiktokTitle:'🎵 Publicité TikTok',
     btnCopy:'Copier', btnCopied:'Copié ✓',
     footerHint:'Relisez et personnalisez le texte avant publication.',
-    tabForm:'✍️ Saisir les détails', tabPhoto:'📸 Photo uniquement',
+    tabForm:'✍️ Saisir les détails', tabPhoto:'📸 Photo uniquement', tabPricing:'💳 Abonnement',
+    pricingTitle:'💳 Abonnement mensuel Wassaf', pricingSubtitle:"Accès complet à toutes les fonctionnalités du site, mois par mois, sans engagement long.",
+    pricingPerMonth:'par mois', pricingFeature1:'✅ Descriptions SEO et arguments de vente illimités', pricingFeature2:'✅ Publicités Facebook et TikTok dans toutes les langues', pricingFeature3:"✅ Génération d'images et de logos produit",
+    btnSubscribe:"S'abonner maintenant", subscribeNotReady:"Les paiements sont encore en cours de configuration et seront bientôt disponibles — restez à l'écoute !",
+    subscribeLoginPrompt:"Connectez-vous d'abord pour vous abonner.", subscribeError:'Une erreur est survenue, réessayez dans un instant.',
     imgCardTitle:'🎨 Image publicitaire', imgTypeAd:'Photo publicitaire du produit', imgTypeLogo:'Logo du produit',
     imgUploadLabel:"⭐ Ajoutez une photo réelle du produit (facultatif) — nous retirons l'arrière-plan et ajoutons un décor de studio, en gardant votre produit exactement tel quel",
     btnGenImage:'Générer une image ✨',
@@ -556,7 +588,11 @@ const translations = {
     outFbTitle:'📘 Anuncio de Facebook / Instagram', outTiktokTitle:'🎵 Anuncio de TikTok',
     btnCopy:'Copiar', btnCopied:'Copiado ✓',
     footerHint:'Revisa y personaliza el texto antes de publicarlo.',
-    tabForm:'✍️ Escribir datos', tabPhoto:'📸 Solo foto',
+    tabForm:'✍️ Escribir datos', tabPhoto:'📸 Solo foto', tabPricing:'💳 Suscripción',
+    pricingTitle:'💳 Suscripción mensual de Wassaf', pricingSubtitle:'Acceso completo a todas las funciones del sitio, mes a mes, sin compromiso largo.',
+    pricingPerMonth:'al mes', pricingFeature1:'✅ Descripciones SEO y puntos de venta ilimitados', pricingFeature2:'✅ Anuncios de Facebook y TikTok en todos los idiomas', pricingFeature3:'✅ Generación de imágenes y logos de producto',
+    btnSubscribe:'Suscribirme ahora', subscribeNotReady:'Los pagos todavía se están configurando y estarán disponibles muy pronto — ¡mantente atento!',
+    subscribeLoginPrompt:'Inicia sesión primero para suscribirte.', subscribeError:'Ocurrió un error, inténtalo de nuevo en un momento.',
     imgCardTitle:'🎨 Imagen publicitaria', imgTypeAd:'Foto publicitaria del producto', imgTypeLogo:'Logo del producto',
     imgUploadLabel:'⭐ Sube una foto real del producto (opcional) — quitaremos el fondo y pondremos un fondo de estudio, manteniendo tu producto exactamente igual',
     btnGenImage:'Generar imagen ✨',
@@ -1257,8 +1293,63 @@ async function runCompare(){
 function switchPage(page){
   document.getElementById('pageForm').style.display = page==='form' ? '' : 'none';
   document.getElementById('pagePhoto').style.display = page==='photo' ? '' : 'none';
+  document.getElementById('pagePricing').style.display = page==='pricing' ? '' : 'none';
   document.getElementById('pageTabForm').classList.toggle('active', page==='form');
   document.getElementById('pageTabPhoto').classList.toggle('active', page==='photo');
+  document.getElementById('pageTabPricing').classList.toggle('active', page==='pricing');
+  if(page === 'pricing') loadPricing();
+}
+
+let cachedCountry = null;
+async function detectCountry(){
+  if(cachedCountry) return cachedCountry;
+  try{
+    const r = await fetch('/api/geo');
+    const data = await r.json();
+    cachedCountry = data.country || 'EG';
+  }catch(e){
+    cachedCountry = 'EG';
+  }
+  return cachedCountry;
+}
+async function loadPricing(){
+  const el = document.getElementById('pricingAmount');
+  el.textContent = '...';
+  const country = await detectCountry();
+  el.textContent = (country === 'EG') ? '300 EGP' : '$25';
+}
+async function handleSubscribeClick(){
+  const t = translations[currentLang];
+  const msgEl = document.getElementById('subscribeMsg');
+  msgEl.classList.remove('show');
+  msgEl.style.display = 'block';
+  if(!currentUser){
+    msgEl.textContent = t.subscribeLoginPrompt;
+    return;
+  }
+  const btn = document.getElementById('subscribeBtn');
+  btn.disabled = true;
+  try{
+    const country = await detectCountry();
+    const res = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ country, userId: currentUser.id, email: currentUser.email })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.status === 503 || (data && data.error === 'payment_not_ready')){
+      msgEl.textContent = t.subscribeNotReady;
+    } else if(res.ok && data.paymentUrl){
+      window.location.href = data.paymentUrl;
+      return;
+    } else {
+      msgEl.textContent = t.subscribeError;
+    }
+  }catch(e){
+    msgEl.textContent = t.subscribeError;
+  }finally{
+    btn.disabled = false;
+  }
 }
 
 async function analyzeFromPhoto(){
