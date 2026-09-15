@@ -859,7 +859,7 @@ function compositeLogoText(imageUrl, text){
 let bgRemovalModulePromise = null;
 function loadBgRemovalModule(){
   if(!bgRemovalModulePromise){
-    bgRemovalModulePromise = import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs');
+    bgRemovalModulePromise = import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
   }
   return bgRemovalModulePromise;
 }
