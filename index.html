@@ -1312,11 +1312,31 @@ async function detectCountry(){
   }
   return cachedCountry;
 }
+
+const countryToCurrency = {
+  EG:'EGP', US:'USD', GB:'GBP', IE:'EUR',
+  DE:'EUR', FR:'EUR', ES:'EUR', IT:'EUR', PT:'EUR', NL:'EUR', BE:'EUR', AT:'EUR',
+  GR:'EUR', FI:'EUR', LU:'EUR', MT:'EUR', CY:'EUR', SK:'EUR', SI:'EUR', EE:'EUR',
+  LV:'EUR', LT:'EUR', HR:'EUR',
+  KW:'KWD', BH:'BHD', OM:'OMR', QA:'QAR', AE:'AED', SA:'SAR', JO:'JOD', LB:'LBP',
+  CA:'CAD', AU:'AUD', NZ:'NZD', CH:'CHF', SE:'SEK', NO:'NOK', DK:'DKK', PL:'PLN',
+  CZ:'CZK', HU:'HUF', RO:'RON', TR:'TRY', IL:'ILS', ZA:'ZAR', JP:'JPY', CN:'CNY',
+  IN:'INR', SG:'SGD', HK:'HKD', KR:'KRW', BR:'BRL', MX:'MXN', MA:'MAD', TN:'TND',
+  DZ:'DZD', IQ:'IQD', SD:'SDG', LY:'LYD', PK:'PKR', BD:'BDT', ID:'IDR', MY:'MYR',
+  PH:'PHP', TH:'THB', VN:'VND', RU:'RUB', UA:'UAH'
+};
 async function loadPricing(){
   const el = document.getElementById('pricingAmount');
   el.textContent = '...';
   const country = await detectCountry();
-  el.textContent = (country === 'EG') ? '300 EGP' : '$25';
+
+  if(country === 'EG'){
+    el.textContent = '300 EGP';
+    return;
+  }
+
+  const currency = countryToCurrency[country] || 'USD';
+  el.textContent = `25 ${currency}`;
 }
 async function handleSubscribeClick(){
   const t = translations[currentLang];
