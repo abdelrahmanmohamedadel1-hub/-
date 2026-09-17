@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wassaf">
 <link rel="manifest" href="/manifest.json">
-<link rel="icon" href="/logo.png" type="image/png">
-<link rel="apple-touch-icon" href="/logo.png">
+<link rel="icon" href="/logo.png?v=2" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png?v=2">
 <title>وصّاف · Wassaf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -113,8 +113,26 @@ textarea{min-height:80px;resize:vertical;}
 .auth-msg.show{display:block;}
 .auth-msg.ok{color:var(--success);}
 .auth-msg.bad{color:#FFD3E1;}
+
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:110;}
+.drawer-overlay.show{display:block;}
+.settings-drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(320px,86vw);background:var(--card);box-shadow:-14px 0 40px rgba(0,0,0,0.4);z-index:111;padding:22px;overflow-y:auto;transform:translateX(100%);transition:transform .25s ease;}
+html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
+.settings-drawer.show{transform:translateX(0);}
+
+.tour-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:120;align-items:center;justify-content:center;padding:16px;}
+.tour-overlay.show{display:flex;}
+.tour-box{background:var(--card);border-radius:22px;padding:24px;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.5);text-align:center;}
+.tour-icon{font-size:38px;margin-bottom:10px;}
+.tour-title{font-size:16px;font-weight:800;color:var(--gold);margin:0 0 10px;}
+.tour-body{color:var(--ink-dim);font-size:13px;line-height:1.8;margin:0 0 18px;}
+.tour-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px;}
+.tour-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);}
+.tour-dot.active{background:var(--gold);}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -124,6 +142,7 @@ textarea{min-height:80px;resize:vertical;}
     <div class="brand-name">وصّاف</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
+    <button type="button" class="auth-btn" id="settingsBtn" onclick="openSettingsDrawer()" title="Settings" style="padding:8px 11px;font-size:15px;">⚙️</button>
     <button type="button" class="auth-btn" id="authBtn" data-i18n="authBtnLogin" onclick="onAuthBtnClick()">تسجيل دخول</button>
     <div class="langbox">
       <select id="langSwitch" onchange="setLanguage(this.value)">
@@ -136,6 +155,25 @@ textarea{min-height:80px;resize:vertical;}
   </div>
 </div>
 
+<div class="drawer-overlay" id="settingsOverlay" onclick="closeSettingsDrawer()"></div>
+<div class="settings-drawer" id="settingsDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div class="modal-title" style="margin:0;" data-i18n="settingsTitle">الإعدادات</div>
+    <button class="modal-close" style="position:static;" onclick="closeSettingsDrawer()">✕</button>
+  </div>
+
+  <div class="section-title" data-i18n="settingsAboutTitle">عن وصّاف</div>
+  <p style="color:var(--ink-dim);font-size:12.5px;line-height:1.9;margin:0 0 18px;" data-i18n="settingsAboutBody"></p>
+
+  <div class="section-title" data-i18n="settingsQuickLinks">وصول سريع</div>
+  <button type="button" class="btn-outline btn-block" style="margin-bottom:8px;" onclick="closeSettingsDrawer();switchPage('form');toggleHistory();">📚 <span data-i18n="btnHistory"></span></button>
+  <button type="button" class="btn-outline btn-block" style="margin-bottom:8px;" onclick="closeSettingsDrawer();switchPage('form');toggleBrandKits();">🎨 <span data-i18n="btnBrandKits"></span></button>
+  <button type="button" class="btn-outline btn-block" style="margin-bottom:18px;" onclick="closeSettingsDrawer();switchPage('pricing');">💳 <span data-i18n="tabPricing"></span></button>
+
+  <div class="section-title" data-i18n="settingsHelpTitle">مساعدة</div>
+  <button type="button" class="btn-outline btn-block" onclick="closeSettingsDrawer();replayTour();">🧭 <span data-i18n="btnReplayTour"></span></button>
+</div>
+
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeAuthModal()">✕</button>
@@ -146,7 +184,33 @@ textarea{min-height:80px;resize:vertical;}
     <input type="text" id="authPassword" placeholder="على الأقل 6 حروف/أرقام">
     <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="handleSignIn()" id="signInBtn" data-i18n="authSignIn">دخول</button>
     <button class="btn-outline btn-block" style="margin-top:10px;" onclick="handleSignUp()" id="signUpBtn" data-i18n="authSignUp">حساب جديد</button>
+    <div style="text-align:center;margin-top:12px;">
+      <button type="button" onclick="openForgotModal()" style="background:none;border:none;color:var(--gold);font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer;" data-i18n="authForgotLink">نسيت كلمة السر؟</button>
+    </div>
     <div class="auth-msg" id="authMsg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeForgotModal()">✕</button>
+    <div class="modal-title" data-i18n="forgotModalTitle">استرجاع كلمة السر</div>
+    <p style="color:var(--ink-dim);font-size:12.5px;line-height:1.8;margin:0 0 14px;" data-i18n="forgotModalDesc"></p>
+    <label data-i18n="authEmailLabel">الإيميل</label>
+    <input type="text" id="forgotEmail" placeholder="example@email.com">
+    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="handleForgotPassword()" id="forgotSendBtn" data-i18n="btnSendResetLink">ابعتي لينك الاسترجاع</button>
+    <div class="auth-msg" id="forgotMsg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resetPasswordModal">
+  <div class="modal-box">
+    <div class="modal-title" data-i18n="resetModalTitle">كلمة سر جديدة</div>
+    <p style="color:var(--ink-dim);font-size:12.5px;line-height:1.8;margin:0 0 14px;" data-i18n="resetModalDesc"></p>
+    <label data-i18n="authPasswordLabel">كلمة السر</label>
+    <input type="text" id="newPassword" placeholder="على الأقل 6 حروف/أرقام">
+    <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="handleSetNewPassword()" id="resetPasswordBtn" data-i18n="btnSetNewPassword">حفظ كلمة السر الجديدة</button>
+    <div class="auth-msg" id="resetMsg"></div>
   </div>
 </div>
 
@@ -247,6 +311,7 @@ textarea{min-height:80px;resize:vertical;}
 
   <div class="results" id="results">
     <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('seoOut').textContent, document.getElementById('bulletsPlainHidden').textContent, document.getElementById('fbOut').textContent, document.getElementById('tiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
+    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="downloadResultsAsPDF('results', document.getElementById('pName').value || 'wassaf')" id="pdfBtnForm">📄 <span data-i18n="btnDownloadPdf"></span></button>
     <div class="out-card">
       <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('seoOut').textContent)" id="s1">🔊</button><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="seoOut"></div>
@@ -288,6 +353,7 @@ textarea{min-height:80px;resize:vertical;}
 
   <div class="results" id="photoResults">
     <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('photoSeoOut').textContent, document.getElementById('photoBulletsPlainHidden').textContent, document.getElementById('photoFbOut').textContent, document.getElementById('photoTiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
+    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="downloadResultsAsPDF('photoResults', 'wassaf')" id="pdfBtnPhoto">📄 <span data-i18n="btnDownloadPdf"></span></button>
     <div class="out-card">
       <div class="out-head"><h3 data-i18n="imgCardTitle"></h3></div>
       <div class="img-loading" id="photoImgLoading" style="display:none;"></div>
@@ -337,6 +403,17 @@ textarea{min-height:80px;resize:vertical;}
   </div>
 </div>
 
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-box">
+    <div class="tour-icon" id="tourIcon">👋</div>
+    <div class="tour-title" id="tourTitle"></div>
+    <div class="tour-body" id="tourBody"></div>
+    <div class="tour-dots" id="tourDots"></div>
+    <button class="btn btn-accent btn-block" onclick="nextTourStep()" id="tourNextBtn"></button>
+    <button type="button" onclick="skipTour()" style="background:none;border:none;color:var(--ink-dim);font-size:12px;margin-top:10px;cursor:pointer;text-decoration:underline;" id="tourSkipBtn"></button>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://sszbvoveeafekfvujhzp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_9lbrNqFsqrPw6Ll06p925A_mA3yLyBT';
@@ -354,6 +431,13 @@ function openAccountModal(){
   document.getElementById('accountModal').classList.add('show');
 }
 function closeAccountModal(){ document.getElementById('accountModal').classList.remove('show'); }
+function openForgotModal(){
+  closeAuthModal();
+  document.getElementById('forgotMsg').classList.remove('show');
+  document.getElementById('forgotModal').classList.add('show');
+}
+function closeForgotModal(){ document.getElementById('forgotModal').classList.remove('show'); }
+function closeResetPasswordModal(){ document.getElementById('resetPasswordModal').classList.remove('show'); }
 
 function onAuthBtnClick(){
   if(currentUser){ openAccountModal(); } else { openAuthModal(); }
@@ -361,6 +445,18 @@ function onAuthBtnClick(){
 
 function showAuthMsg(text, ok){
   const el = document.getElementById('authMsg');
+  el.textContent = text;
+  el.classList.remove('ok','bad');
+  el.classList.add('show', ok ? 'ok' : 'bad');
+}
+function showForgotMsg(text, ok){
+  const el = document.getElementById('forgotMsg');
+  el.textContent = text;
+  el.classList.remove('ok','bad');
+  el.classList.add('show', ok ? 'ok' : 'bad');
+}
+function showResetMsg(text, ok){
+  const el = document.getElementById('resetMsg');
   el.textContent = text;
   el.classList.remove('ok','bad');
   el.classList.add('show', ok ? 'ok' : 'bad');
@@ -397,6 +493,27 @@ async function handleSignIn(){
   closeAuthModal();
 }
 
+async function handleForgotPassword(){
+  const t = translations[currentLang];
+  const email = document.getElementById('forgotEmail').value.trim();
+  if(!email){ showForgotMsg(t.authMsgMissing, false); return; }
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if(error){ showForgotMsg(t.errPrefix + error.message, false); return; }
+  showForgotMsg(t.forgotSentMsg, true);
+}
+
+async function handleSetNewPassword(){
+  const t = translations[currentLang];
+  const password = document.getElementById('newPassword').value;
+  if(!password){ showResetMsg(t.authMsgMissing, false); return; }
+  const { error } = await supabaseClient.auth.updateUser({ password });
+  if(error){ showResetMsg(t.errPrefix + error.message, false); return; }
+  showResetMsg(t.resetSuccessMsg, true);
+  setTimeout(()=>{ closeResetPasswordModal(); }, 1800);
+}
+
 async function handleSignOut(){
   await supabaseClient.auth.signOut();
   currentUser = null;
@@ -413,6 +530,9 @@ async function initAuth(){
   supabaseClient.auth.onAuthStateChange((event, session)=>{
     currentUser = session ? session.user : null;
     updateAuthButton();
+    if(event === 'PASSWORD_RECOVERY'){
+      document.getElementById('resetPasswordModal').classList.add('show');
+    }
   });
 }
 initAuth();
@@ -456,16 +576,33 @@ const translations = {
     btnAnalyze:'🔍 اقرأ من الصورة وولّد الإعلان', btnAnalyzing:'جاري القراءة والتوليد...',
     analyzeErrNoFile:'ارفعي صورة المنتج الأول.',
     btnSpeakAll:'اسمع كل حاجة',
+    btnDownloadPdf:'تحميل PDF', pdfGenerating:'جاري التجهيز...', pdfError:'حصل خطأ في تجهيز الملف، حاولي تاني.',
     btnHistory:'السجل', historyTitle:'📚 المنتجات السابقة', btnClearHistory:'امسح الكل',
     historyEmpty:'لسه مفيش منتجات محفوظة.', btnLoad:'افتح',
     btnCompareToggle:'قارن نبرتين', compareToneA:'النبرة الأولى', compareToneB:'النبرة الثانية', btnRunCompare:'⚖️ قارن دلوقتي',
     authBtnLogin:'تسجيل دخول', authModalTitle:'تسجيل الدخول', authEmailLabel:'الإيميل', authPasswordLabel:'كلمة السر',
     authSignIn:'دخول', authSignUp:'حساب جديد', accountModalTitle:'حسابك', accountSignOut:'تسجيل خروج',
     authMsgMissing:'اكتبي الإيميل وكلمة السر.', authMsgSignedUp:'اتعمل الحساب! ممكن يطلب منك تأكيد الإيميل الأول - افحصي بريدك.',
+    authForgotLink:'نسيت كلمة السر؟', forgotModalTitle:'استرجاع كلمة السر',
+    forgotModalDesc:'اكتبي إيميلك وهنبعتلك لينك تقدري بيه تختاري كلمة سر جديدة.',
+    btnSendResetLink:'ابعتي لينك الاسترجاع', forgotSentMsg:'اتبعت! افحصي بريدك ودوسي على اللينك عشان تختاري كلمة سر جديدة.',
+    resetModalTitle:'كلمة سر جديدة', resetModalDesc:'اكتبي كلمة السر الجديدة اللي عايزة تستخدميها من دلوقتي.',
+    btnSetNewPassword:'حفظ كلمة السر الجديدة', resetSuccessMsg:'اتغيرت كلمة السر بنجاح!',
     historyLoginPrompt:'سجّلي دخول الأول عشان تشوفي سجلك.',
     btnBrandKits:'الهويات المحفوظة', brandKitTitle:'🎨 هويات المنتجات المحفوظة', btnSaveBrandKit:'+ احفظ الحالية',
     brandKitEmpty:'لسه مفيش هويات محفوظة. املي بيانات المنتج واحفظيها.', brandKitNamePrompt:'اكتبي اسم مختصر للهوية دي (مثلاً: حذاء الجري)',
     brandKitLoginPrompt:'سجّلي دخول الأول عشان تحفظي الهويات.', btnUseBrandKit:'استخدم', brandKitSaved:'اتحفظت الهوية!',
+    settingsTitle:'الإعدادات', settingsAboutTitle:'عن وصّاف',
+    settingsAboutBody:'وصّاف موقع بيولّد محتوى تسويقي احترافي لمنتجك بالذكاء الاصطناعي - وصف SEO، نقاط بيع، إعلانات فيسبوك وتيك توك، وصور وشعارات، بأكتر من لغة.',
+    settingsQuickLinks:'وصول سريع', settingsHelpTitle:'مساعدة', btnReplayTour:'شوفي الجولة التعريفية تاني',
+    tourNext:'التالي', tourFinish:'يلا نبدأ', tourSkip:'تخطي',
+    tourSteps:[
+      {icon:'👋', title:'أهلًا بيكي في وصّاف!', body:'جولة سريعة (نص دقيقة بس) توريكي أهم حاجات الموقع.'},
+      {icon:'✍️', title:'اكتبي بيانات منتجك', body:'اكتبي اسم المنتج ومميزاته، أو ارفعي صورة بس والذكاء الاصطناعي هيقرا منها كل حاجة.'},
+      {icon:'🎨', title:'احفظي هوية المنتج', body:'بعد ما تولّدي محتوى، احفظي بيانات المنتج كـ"هوية" عشان ترجعي تستخدميها من غير ما تكتبيها تاني.'},
+      {icon:'📚', title:'السجل محفوظ ليكي', body:'كل حاجة ولّدتيها قبل كده هتلاقيها محفوظة في "السجل" - بس لازم تكوني مسجلة دخول.'},
+      {icon:'⚙️', title:'كل حاجة من هنا', body:'دوسي على أيقونة الترس ⚙️ فوق في أي وقت عشان توصلي بسرعة لأي حاجة في الموقع.'}
+    ],
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -506,16 +643,33 @@ const translations = {
     btnAnalyze:'🔍 Read the photo and generate the ad', btnAnalyzing:'Reading and generating...',
     analyzeErrNoFile:'Upload a product photo first.',
     btnSpeakAll:'Listen to everything',
+    btnDownloadPdf:'Download PDF', pdfGenerating:'Preparing...', pdfError:'Something went wrong preparing the file, try again.',
     btnHistory:'History', historyTitle:'📚 Previous products', btnClearHistory:'Clear all',
     historyEmpty:'No saved products yet.', btnLoad:'Open',
     btnCompareToggle:'Compare two tones', compareToneA:'First tone', compareToneB:'Second tone', btnRunCompare:'⚖️ Compare now',
     authBtnLogin:'Sign in', authModalTitle:'Sign in', authEmailLabel:'Email', authPasswordLabel:'Password',
     authSignIn:'Sign in', authSignUp:'Create account', accountModalTitle:'Your account', accountSignOut:'Sign out',
     authMsgMissing:'Enter your email and password.', authMsgSignedUp:'Account created! You may need to confirm your email first — check your inbox.',
+    authForgotLink:'Forgot your password?', forgotModalTitle:'Reset your password',
+    forgotModalDesc:"Enter your email and we'll send you a link to choose a new password.",
+    btnSendResetLink:'Send reset link', forgotSentMsg:'Sent! Check your inbox and click the link to choose a new password.',
+    resetModalTitle:'New password', resetModalDesc:'Enter the new password you want to use from now on.',
+    btnSetNewPassword:'Save new password', resetSuccessMsg:'Password changed successfully!',
     historyLoginPrompt:'Sign in first to see your history.',
     btnBrandKits:'Brand kits', brandKitTitle:'🎨 Saved brand kits', btnSaveBrandKit:'+ Save current',
     brandKitEmpty:'No brand kits saved yet. Fill in product details and save them.', brandKitNamePrompt:'Name this brand kit (e.g. Running shoe)',
     brandKitLoginPrompt:'Sign in first to save brand kits.', btnUseBrandKit:'Use', brandKitSaved:'Brand kit saved!',
+    settingsTitle:'Settings', settingsAboutTitle:'About Wassaf',
+    settingsAboutBody:'Wassaf generates professional marketing content for your product with AI — SEO descriptions, selling points, Facebook and TikTok ads, and images or logos, in multiple languages.',
+    settingsQuickLinks:'Quick access', settingsHelpTitle:'Help', btnReplayTour:'Replay the walkthrough',
+    tourNext:'Next', tourFinish:"Let's go", tourSkip:'Skip',
+    tourSteps:[
+      {icon:'👋', title:'Welcome to Wassaf!', body:'A quick tour (30 seconds) of the main things you can do here.'},
+      {icon:'✍️', title:'Enter your product details', body:'Type in the name and features, or just upload a photo and the AI will read everything from it.'},
+      {icon:'🎨', title:'Save a brand kit', body:'After generating content, save the product details as a "brand kit" so you can reuse them without retyping.'},
+      {icon:'📚', title:'Your history is saved', body:"Everything you've generated before shows up in your History — you just need to be signed in."},
+      {icon:'⚙️', title:'Everything from here', body:'Tap the ⚙️ icon at the top anytime to quickly reach anything on the site.'}
+    ],
     langName:'English'
   },
   fr: {
@@ -556,16 +710,33 @@ const translations = {
     btnAnalyze:'🔍 Lire la photo et générer la publicité', btnAnalyzing:'Lecture et génération...',
     analyzeErrNoFile:"Téléchargez d'abord une photo du produit.",
     btnSpeakAll:'Tout écouter',
+    btnDownloadPdf:'Télécharger en PDF', pdfGenerating:'Préparation...', pdfError:'Une erreur est survenue lors de la préparation du fichier, réessayez.',
     btnHistory:'Historique', historyTitle:'📚 Produits précédents', btnClearHistory:'Tout effacer',
     historyEmpty:'Aucun produit enregistré pour le moment.', btnLoad:'Ouvrir',
     btnCompareToggle:'Comparer deux tons', compareToneA:'Premier ton', compareToneB:'Deuxième ton', btnRunCompare:'⚖️ Comparer maintenant',
     authBtnLogin:'Se connecter', authModalTitle:'Connexion', authEmailLabel:'E-mail', authPasswordLabel:'Mot de passe',
     authSignIn:'Connexion', authSignUp:'Créer un compte', accountModalTitle:'Votre compte', accountSignOut:'Déconnexion',
     authMsgMissing:'Entrez votre e-mail et mot de passe.', authMsgSignedUp:"Compte créé ! Vous devrez peut-être confirmer votre e-mail — vérifiez votre boîte de réception.",
+    authForgotLink:'Mot de passe oublié ?', forgotModalTitle:'Réinitialiser le mot de passe',
+    forgotModalDesc:"Entrez votre e-mail et nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+    btnSendResetLink:'Envoyer le lien', forgotSentMsg:'Envoyé ! Vérifiez votre boîte de réception et cliquez sur le lien pour choisir un nouveau mot de passe.',
+    resetModalTitle:'Nouveau mot de passe', resetModalDesc:'Entrez le nouveau mot de passe que vous voulez utiliser désormais.',
+    btnSetNewPassword:'Enregistrer le nouveau mot de passe', resetSuccessMsg:'Mot de passe modifié avec succès !',
     historyLoginPrompt:'Connectez-vous pour voir votre historique.',
     btnBrandKits:'Kits de marque', brandKitTitle:'🎨 Kits de marque enregistrés', btnSaveBrandKit:'+ Enregistrer',
     brandKitEmpty:"Aucun kit de marque enregistré. Remplissez les détails du produit et enregistrez-les.", brandKitNamePrompt:'Nommez ce kit de marque (ex: Chaussure de course)',
     brandKitLoginPrompt:'Connectez-vous pour enregistrer des kits de marque.', btnUseBrandKit:'Utiliser', brandKitSaved:'Kit de marque enregistré !',
+    settingsTitle:'Paramètres', settingsAboutTitle:'À propos de Wassaf',
+    settingsAboutBody:"Wassaf génère du contenu marketing professionnel pour votre produit grâce à l'IA — descriptions SEO, arguments de vente, publicités Facebook et TikTok, images et logos, en plusieurs langues.",
+    settingsQuickLinks:'Accès rapide', settingsHelpTitle:'Aide', btnReplayTour:'Revoir la visite guidée',
+    tourNext:'Suivant', tourFinish:"C'est parti", tourSkip:'Passer',
+    tourSteps:[
+      {icon:'👋', title:'Bienvenue sur Wassaf !', body:'Une visite rapide (30 secondes) des principales fonctionnalités.'},
+      {icon:'✍️', title:'Entrez les détails du produit', body:"Saisissez le nom et les caractéristiques, ou téléchargez simplement une photo et l'IA lira tout dedans."},
+      {icon:'🎨', title:'Enregistrez un kit de marque', body:'Après avoir généré du contenu, enregistrez les détails du produit comme "kit de marque" pour les réutiliser sans tout ressaisir.'},
+      {icon:'📚', title:'Votre historique est enregistré', body:"Tout ce que vous avez généré apparaît dans votre historique — il suffit d'être connecté(e)."},
+      {icon:'⚙️', title:'Tout est ici', body:"Appuyez sur l'icône ⚙️ en haut à tout moment pour accéder rapidement à tout sur le site."}
+    ],
     langName:'French'
   },
   es: {
@@ -606,16 +777,33 @@ const translations = {
     btnAnalyze:'🔍 Leer la foto y generar el anuncio', btnAnalyzing:'Leyendo y generando...',
     analyzeErrNoFile:'Sube primero una foto del producto.',
     btnSpeakAll:'Escuchar todo',
+    btnDownloadPdf:'Descargar PDF', pdfGenerating:'Preparando...', pdfError:'Ocurrió un error al preparar el archivo, inténtalo de nuevo.',
     btnHistory:'Historial', historyTitle:'📚 Productos anteriores', btnClearHistory:'Borrar todo',
     historyEmpty:'Aún no hay productos guardados.', btnLoad:'Abrir',
     btnCompareToggle:'Comparar dos tonos', compareToneA:'Primer tono', compareToneB:'Segundo tono', btnRunCompare:'⚖️ Comparar ahora',
     authBtnLogin:'Iniciar sesión', authModalTitle:'Iniciar sesión', authEmailLabel:'Correo electrónico', authPasswordLabel:'Contraseña',
     authSignIn:'Iniciar sesión', authSignUp:'Crear cuenta', accountModalTitle:'Tu cuenta', accountSignOut:'Cerrar sesión',
     authMsgMissing:'Ingresa tu correo y contraseña.', authMsgSignedUp:'¡Cuenta creada! Es posible que debas confirmar tu correo — revisa tu bandeja de entrada.',
+    authForgotLink:'¿Olvidaste tu contraseña?', forgotModalTitle:'Restablecer contraseña',
+    forgotModalDesc:'Ingresa tu correo y te enviaremos un enlace para elegir una nueva contraseña.',
+    btnSendResetLink:'Enviar enlace', forgotSentMsg:'¡Enviado! Revisa tu bandeja de entrada y haz clic en el enlace para elegir una nueva contraseña.',
+    resetModalTitle:'Nueva contraseña', resetModalDesc:'Ingresa la nueva contraseña que quieres usar de ahora en adelante.',
+    btnSetNewPassword:'Guardar nueva contraseña', resetSuccessMsg:'¡Contraseña cambiada con éxito!',
     historyLoginPrompt:'Inicia sesión para ver tu historial.',
     btnBrandKits:'Kits de marca', brandKitTitle:'🎨 Kits de marca guardados', btnSaveBrandKit:'+ Guardar actual',
     brandKitEmpty:'Aún no hay kits de marca guardados. Completa los datos del producto y guárdalos.', brandKitNamePrompt:'Nombra este kit de marca (ej: Zapatilla de running)',
     brandKitLoginPrompt:'Inicia sesión para guardar kits de marca.', btnUseBrandKit:'Usar', brandKitSaved:'¡Kit de marca guardado!',
+    settingsTitle:'Configuración', settingsAboutTitle:'Sobre Wassaf',
+    settingsAboutBody:'Wassaf genera contenido de marketing profesional para tu producto con IA — descripciones SEO, puntos de venta, anuncios de Facebook y TikTok, e imágenes o logos, en varios idiomas.',
+    settingsQuickLinks:'Acceso rápido', settingsHelpTitle:'Ayuda', btnReplayTour:'Ver el recorrido de nuevo',
+    tourNext:'Siguiente', tourFinish:'Empecemos', tourSkip:'Saltar',
+    tourSteps:[
+      {icon:'👋', title:'¡Bienvenida a Wassaf!', body:'Un recorrido rápido (30 segundos) de lo principal que puedes hacer aquí.'},
+      {icon:'✍️', title:'Ingresa los datos de tu producto', body:'Escribe el nombre y las características, o simplemente sube una foto y la IA leerá todo de ahí.'},
+      {icon:'🎨', title:'Guarda un kit de marca', body:'Después de generar contenido, guarda los datos del producto como "kit de marca" para reutilizarlos sin volver a escribirlos.'},
+      {icon:'📚', title:'Tu historial se guarda', body:'Todo lo que has generado antes aparece en tu Historial — solo necesitas haber iniciado sesión.'},
+      {icon:'⚙️', title:'Todo está aquí', body:'Toca el ícono ⚙️ arriba en cualquier momento para acceder rápidamente a todo en el sitio.'}
+    ],
     langName:'Spanish'
   }
 };
@@ -1290,6 +1478,86 @@ async function runCompare(){
   }
 }
 
+async function downloadResultsAsPDF(containerId, filenamePrefix){
+  const btn = containerId === 'results' ? document.getElementById('pdfBtnForm') : document.getElementById('pdfBtnPhoto');
+  const t = translations[currentLang];
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = t.pdfGenerating;
+  try{
+    const element = document.getElementById(containerId);
+    const canvas = await html2canvas(element, { backgroundColor: '#1E1240', scale: 2, useCORS: true });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    const safeName = (filenamePrefix || 'wassaf').toString().trim().replace(/[^\p{L}\p{N}_-]+/gu, '-').slice(0, 40) || 'wassaf';
+    pdf.save(`${safeName}.pdf`);
+  }catch(e){
+    console.error(e);
+    alert(t.pdfError);
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
+}
+
+function openSettingsDrawer(){
+  document.getElementById('settingsOverlay').classList.add('show');
+  document.getElementById('settingsDrawer').classList.add('show');
+}
+function closeSettingsDrawer(){
+  document.getElementById('settingsOverlay').classList.remove('show');
+  document.getElementById('settingsDrawer').classList.remove('show');
+}
+
+const TOUR_KEY = 'wassaf_tour_seen';
+let tourStepIndex = 0;
+function getTourSteps(){
+  const t = translations[currentLang];
+  return t.tourSteps;
+}
+function renderTourStep(){
+  const t = translations[currentLang];
+  const steps = getTourSteps();
+  const step = steps[tourStepIndex];
+  document.getElementById('tourIcon').textContent = step.icon;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourBody').textContent = step.body;
+  document.getElementById('tourDots').innerHTML = steps.map((s,i)=>`<div class="tour-dot${i===tourStepIndex?' active':''}"></div>`).join('');
+  document.getElementById('tourNextBtn').textContent = (tourStepIndex === steps.length-1) ? t.tourFinish : t.tourNext;
+  document.getElementById('tourSkipBtn').textContent = t.tourSkip;
+  document.getElementById('tourSkipBtn').style.display = (tourStepIndex === steps.length-1) ? 'none' : 'inline';
+}
+function nextTourStep(){
+  const steps = getTourSteps();
+  if(tourStepIndex < steps.length-1){
+    tourStepIndex++;
+    renderTourStep();
+  } else {
+    closeTour();
+  }
+}
+function skipTour(){ closeTour(); }
+function closeTour(){
+  document.getElementById('tourOverlay').classList.remove('show');
+  try{ localStorage.setItem(TOUR_KEY, '1'); }catch(e){}
+}
+function replayTour(){
+  tourStepIndex = 0;
+  renderTourStep();
+  document.getElementById('tourOverlay').classList.add('show');
+}
+function maybeShowTourOnFirstVisit(){
+  let seen = false;
+  try{ seen = !!localStorage.getItem(TOUR_KEY); }catch(e){}
+  if(!seen){
+    tourStepIndex = 0;
+    renderTourStep();
+    document.getElementById('tourOverlay').classList.add('show');
+  }
+}
+
 function switchPage(page){
   document.getElementById('pageForm').style.display = page==='form' ? '' : 'none';
   document.getElementById('pagePhoto').style.display = page==='photo' ? '' : 'none';
@@ -1444,6 +1712,7 @@ async function analyzeFromPhoto(){
 (async function init(){
   const lang = await loadLang();
   setLanguage(lang);
+  maybeShowTourOnFirstVisit();
 })();
 </script>
 </body>
