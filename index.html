@@ -129,10 +129,26 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
 .tour-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px;}
 .tour-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);}
 .tour-dot.active{background:var(--gold);}
+
+#wassafPrintArea{display:none;}
+@media print{
+  body.printing-mode > *:not(#wassafPrintArea){display:none !important;}
+  body.printing-mode{background:#fff !important;}
+  #wassafPrintArea{
+    display:block !important;
+    background:#fff; color:#111;
+    font-family:'Tajawal','Cairo',Arial,sans-serif;
+    font-size:16px; line-height:2; padding:10px 4px;
+  }
+  #wassafPrintArea .wpp-header h1{font-size:26px;font-weight:800;margin:0 0 22px;color:#111;}
+  #wassafPrintArea .wpp-section{margin-bottom:26px;page-break-inside:avoid;}
+  #wassafPrintArea .wpp-section h2{font-size:19px;font-weight:800;margin:0 0 10px;color:#111;border-bottom:2px solid #333;padding-bottom:6px;}
+  #wassafPrintArea .wpp-section p{margin:0;white-space:pre-wrap;}
+  #wassafPrintArea .wpp-section ul{margin:0;padding-inline-start:22px;}
+  #wassafPrintArea .wpp-section li{margin-bottom:8px;}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -311,7 +327,7 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
 
   <div class="results" id="results">
     <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('seoOut').textContent, document.getElementById('bulletsPlainHidden').textContent, document.getElementById('fbOut').textContent, document.getElementById('tiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
-    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="downloadResultsAsPDF('results', document.getElementById('pName').value || 'wassaf')" id="pdfBtnForm">📄 <span data-i18n="btnDownloadPdf"></span></button>
+    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="printResultsAsPDF('form')" id="pdfBtnForm">📄 <span data-i18n="btnDownloadPdf"></span></button>
     <div class="out-card">
       <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('seoOut').textContent)" id="s1">🔊</button><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div></div>
       <div class="out-body" id="seoOut"></div>
@@ -353,7 +369,7 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
 
   <div class="results" id="photoResults">
     <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('photoSeoOut').textContent, document.getElementById('photoBulletsPlainHidden').textContent, document.getElementById('photoFbOut').textContent, document.getElementById('photoTiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
-    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="downloadResultsAsPDF('photoResults', 'wassaf')" id="pdfBtnPhoto">📄 <span data-i18n="btnDownloadPdf"></span></button>
+    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="printResultsAsPDF('photo')" id="pdfBtnPhoto">📄 <span data-i18n="btnDownloadPdf"></span></button>
     <div class="out-card">
       <div class="out-head"><h3 data-i18n="imgCardTitle"></h3></div>
       <div class="img-loading" id="photoImgLoading" style="display:none;"></div>
@@ -1478,28 +1494,51 @@ async function runCompare(){
   }
 }
 
-async function downloadResultsAsPDF(containerId, filenamePrefix){
-  const btn = containerId === 'results' ? document.getElementById('pdfBtnForm') : document.getElementById('pdfBtnPhoto');
+function escapePrintHtml(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function buildPrintSection(title, bodyText){
+  if(!bodyText) return '';
+  return `<div class="wpp-section"><h2>${escapePrintHtml(title)}</h2><p>${escapePrintHtml(bodyText).replace(/\n/g,'<br>')}</p></div>`;
+}
+function buildPrintBulletsSection(title, bulletsText){
+  if(!bulletsText) return '';
+  const items = bulletsText.split('\n').map(l=>l.replace(/^•\s*/,'').trim()).filter(Boolean);
+  if(items.length === 0) return '';
+  return `<div class="wpp-section"><h2>${escapePrintHtml(title)}</h2><ul>${items.map(i=>`<li>${escapePrintHtml(i)}</li>`).join('')}</ul></div>`;
+}
+
+function printResultsAsPDF(kind){
   const t = translations[currentLang];
-  const originalText = btn.innerHTML;
-  btn.disabled = true;
-  btn.textContent = t.pdfGenerating;
-  try{
-    const element = document.getElementById(containerId);
-    const canvas = await html2canvas(element, { backgroundColor: '#1E1240', scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    const safeName = (filenamePrefix || 'wassaf').toString().trim().replace(/[^\p{L}\p{N}_-]+/gu, '-').slice(0, 40) || 'wassaf';
-    pdf.save(`${safeName}.pdf`);
-  }catch(e){
-    console.error(e);
-    alert(t.pdfError);
-  }finally{
-    btn.disabled = false;
-    btn.innerHTML = originalText;
-  }
+  const name = kind === 'form'
+    ? document.getElementById('pName').value.trim()
+    : '';
+
+  const seo = document.getElementById(kind === 'form' ? 'seoOut' : 'photoSeoOut').textContent;
+  const bullets = document.getElementById(kind === 'form' ? 'bulletsPlainHidden' : 'photoBulletsPlainHidden').textContent;
+  const fb = document.getElementById(kind === 'form' ? 'fbOut' : 'photoFbOut').textContent;
+  const tiktok = document.getElementById(kind === 'form' ? 'tiktokOut' : 'photoTiktokOut').textContent;
+
+  let html = `<div class="wpp-header"><h1>${escapePrintHtml(name || 'Wassaf')}</h1></div>`;
+  html += buildPrintSection(t.outSeoTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), seo);
+  html += buildPrintBulletsSection(t.outBulletsTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), bullets);
+  html += buildPrintSection(t.outFbTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), fb);
+  html += buildPrintSection(t.outTiktokTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), tiktok);
+
+  const area = document.createElement('div');
+  area.id = 'wassafPrintArea';
+  area.dir = (translations[currentLang].dir === 'rtl') ? 'rtl' : 'ltr';
+  area.innerHTML = html;
+  document.body.appendChild(area);
+  document.body.classList.add('printing-mode');
+
+  const cleanup = () => {
+    document.body.classList.remove('printing-mode');
+    area.remove();
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+  setTimeout(cleanup, 15000);
 }
 
 function openSettingsDrawer(){
