@@ -132,6 +132,7 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
 
 #wassafPrintArea{display:none;}
 @media print{
+  @page{ size: portrait; margin: 16mm 14mm; }
   body.printing-mode > *:not(#wassafPrintArea){display:none !important;}
   body.printing-mode{background:#fff !important;}
   body.printing-mode::before, body.printing-mode::after{display:none !important;content:none !important;}
