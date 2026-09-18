@@ -134,6 +134,7 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
 @media print{
   body.printing-mode > *:not(#wassafPrintArea){display:none !important;}
   body.printing-mode{background:#fff !important;}
+  body.printing-mode::before, body.printing-mode::after{display:none !important;content:none !important;}
   #wassafPrintArea{
     display:block !important;
     background:#fff; color:#111;
@@ -1533,11 +1534,16 @@ function printResultsAsPDF(kind){
 
   const cleanup = () => {
     document.body.classList.remove('printing-mode');
-    area.remove();
+    if(area.parentNode) area.remove();
     window.removeEventListener('afterprint', cleanup);
   };
   window.addEventListener('afterprint', cleanup);
-  window.print();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.print();
+    });
+  });
   setTimeout(cleanup, 15000);
 }
 
