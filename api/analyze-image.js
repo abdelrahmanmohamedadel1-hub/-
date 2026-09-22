@@ -48,7 +48,7 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'qwen/qwen3.6-27b',
+        model: 'qwen/qwen3.8-27b',
         reasoning_effort: 'none',
         messages: [
           { role: 'system', content: system },
@@ -80,4 +80,3 @@ IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] exa
     return res.status(500).json({ error: { message: e.message || 'Server error' } });
   }
 }
- 
