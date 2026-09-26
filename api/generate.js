@@ -1,6 +1,21 @@
+function isTrustedOrigin(req) {
+  const allowedHost = 'wassaf-app.vercel.app';
+  const origin = req.headers.origin || '';
+  const referer = req.headers.referer || '';
+  try {
+    if (origin) return new URL(origin).host === allowedHost;
+    if (referer) return new URL(referer).host === allowedHost;
+  } catch (e) {}
+  return false;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: { message: 'Method not allowed' } });
+  }
+
+  if (!isTrustedOrigin(req)) {
+    return res.status(403).json({ error: { message: 'Forbidden' } });
   }
 
   try {
