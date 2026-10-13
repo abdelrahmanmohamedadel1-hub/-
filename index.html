@@ -130,6 +130,8 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
 .tour-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);}
 .tour-dot.active{background:var(--gold);}
 
+.kit-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;}
+.kit-tabs .tone-opt{flex:none;padding:9px 13px;}
 #wassafPrintArea{display:none;}
 @media print{
   @page{ size: portrait; margin: 16mm 14mm; }
@@ -290,6 +292,9 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
     <label data-i18n="labelTone"></label>
     <div class="tonegrid" id="toneGrid"></div>
 
+    <label data-i18n="labelGoal"></label>
+    <select id="pGoal"></select>
+
     <button class="btn btn-accent btn-block" style="margin-top:16px;" onclick="generateContent()" id="genBtn">
       <span class="btn-label" data-i18n="btnGenerate"></span>
     </button>
@@ -328,30 +333,13 @@ html[dir="rtl"] .settings-drawer{transform:translateX(-100%);}
   </div>
 
   <div class="results" id="results">
-    <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText([document.getElementById('seoOut').textContent, document.getElementById('bulletsPlainHidden').textContent, document.getElementById('fbOut').textContent, document.getElementById('tiktokOut').textContent].join('. '))">🔊 <span data-i18n="btnSpeakAll"></span></button>
-    <button class="btn-outline btn-block" style="margin-bottom:12px;" onclick="printResultsAsPDF('form')" id="pdfBtnForm">📄 <span data-i18n="btnDownloadPdf"></span></button>
-    <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outSeoTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('seoOut').textContent)" id="s1">🔊</button><button class="btn-outline" onclick="copyOut('seoOut','c1')" id="c1" data-i18n="btnCopy"></button></div></div>
-      <div class="out-body" id="seoOut"></div>
-      <div class="kw-wrap" id="kwWrap"></div>
+    <button class="btn btn-accent btn-block" style="margin-bottom:12px;" onclick="speakText(kitPlainText(currentKit))">🔊 <span data-i18n="btnSpeakAll"></span></button>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="btn-outline" style="flex:1;" onclick="printResultsAsPDF('form')" id="pdfBtnForm">📄 <span data-i18n="btnDownloadPdf"></span></button>
+      <button class="btn-outline" style="flex:1;" onclick="generateContent()">🔄 <span data-i18n="btnRegenerate"></span></button>
     </div>
-
-    <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outBulletsTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('bulletsPlainHidden').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('bulletsPlainHidden','c2')" id="c2" data-i18n="btnCopy"></button></div></div>
-      <ul class="bullets" id="bulletsOut"></ul>
-      <div id="bulletsPlainHidden" style="display:none;"></div>
-    </div>
-
-    <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outFbTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('fbOut').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('fbOut','c3')" id="c3" data-i18n="btnCopy"></button></div></div>
-      <div class="out-body" id="fbOut"></div>
-    </div>
-
-    <div class="out-card">
-      <div class="out-head"><h3><span data-i18n="outTiktokTitle"></span></h3><div style="display:flex;gap:6px;"><button class="btn-outline" onclick="speakText(document.getElementById('tiktokOut').textContent)">🔊</button><button class="btn-outline" onclick="copyOut('tiktokOut','c4')" id="c4" data-i18n="btnCopy"></button></div></div>
-      <div class="out-body" id="tiktokOut"></div>
-    </div>
-
+    <div class="kit-tabs" id="kitTabs"></div>
+    <div id="kitPanels"></div>
     <div class="hint" data-i18n="footerHint"></div>
   </div>
 </div>
@@ -621,6 +609,9 @@ const translations = {
       {icon:'📚', title:'السجل محفوظ ليكي', body:'كل حاجة ولّدتيها قبل كده هتلاقيها محفوظة في "السجل" - بس لازم تكوني مسجلة دخول.'},
       {icon:'⚙️', title:'كل حاجة من هنا', body:'دوسي على أيقونة الترس ⚙️ فوق في أي وقت عشان توصلي بسرعة لأي حاجة في الموقع.'}
     ],
+        labelGoal:'الهدف التسويقي', goals:['زيادة المبيعات','الانتشار والوعي','جلب زيارات','إطلاق منتج','بناء الثقة'], btnRegenerate:'إعادة التوليد',
+    kitTabs:['نظرة عامة','SEO','الوصف','نقاط البيع','الإعلانات','TikTok','الجمهور'],
+    kl:{summary:'ملخص المنتج', angle:'زاوية البيع الأساسية', forWho:'مناسب لـ', seoTitle:'عنوان SEO', meta:'وصف الميتا', keyword:'الكلمة المفتاحية الأساسية', keywords:'كلمات مفتاحية', slug:'رابط الصفحة (Slug)', short:'وصف قصير', long:'وصف طويل', hook:'الجملة الافتتاحية (Hook)', video:'فكرة الفيديو', script:'السكريبت', onScreen:'النص على الشاشة', caption:'الكابشن', cta:'دعوة للإجراء (CTA)', hashtags:'الهاشتاجات', who:'الجمهور', problems:'مشاكل العميل', motivation:'دافع الشراء', howToSell:'إزاي تبيعي لهم'},
     langName:'Arabic (Modern Standard Arabic, easy to read)'
   },
   en: {
@@ -688,6 +679,9 @@ const translations = {
       {icon:'📚', title:'Your history is saved', body:"Everything you've generated before shows up in your History — you just need to be signed in."},
       {icon:'⚙️', title:'Everything from here', body:'Tap the ⚙️ icon at the top anytime to quickly reach anything on the site.'}
     ],
+        labelGoal:'Marketing goal', goals:['Increase sales','Brand awareness','Get clicks','Launch a product','Build trust'], btnRegenerate:'Regenerate',
+    kitTabs:['Overview','SEO','Description','Selling points','Ads','TikTok','Audience'],
+    kl:{summary:'Product summary', angle:'Main selling angle', forWho:'Made for', seoTitle:'SEO title', meta:'Meta description', keyword:'Primary keyword', keywords:'Keywords', slug:'URL slug', short:'Short description', long:'Long description', hook:'Hook', video:'Video idea', script:'Script', onScreen:'On-screen text', caption:'Caption', cta:'Call to action', hashtags:'Hashtags', who:'Who they are', problems:'Customer problems', motivation:'Buying motivation', howToSell:'How to sell to them'},
     langName:'English'
   },
   fr: {
@@ -755,6 +749,9 @@ const translations = {
       {icon:'📚', title:'Votre historique est enregistré', body:"Tout ce que vous avez généré apparaît dans votre historique — il suffit d'être connecté(e)."},
       {icon:'⚙️', title:'Tout est ici', body:"Appuyez sur l'icône ⚙️ en haut à tout moment pour accéder rapidement à tout sur le site."}
     ],
+        labelGoal:'Objectif marketing', goals:['Augmenter les ventes','Notoriété de la marque','Générer des clics','Lancer un produit','Bâtir la confiance'], btnRegenerate:'Régénérer',
+    kitTabs:['Aperçu','SEO','Description','Arguments','Publicités','TikTok','Audience'],
+    kl:{summary:'Résumé du produit', angle:'Angle de vente principal', forWho:'Conçu pour', seoTitle:'Titre SEO', meta:'Méta-description', keyword:'Mot-clé principal', keywords:'Mots-clés', slug:"Slug de l'URL", short:'Description courte', long:'Description longue', hook:'Accroche', video:'Idée de vidéo', script:'Script', onScreen:"Texte à l'écran", caption:'Légende', cta:"Appel à l'action", hashtags:'Hashtags', who:'Qui sont-ils', problems:'Problèmes du client', motivation:"Motivation d'achat", howToSell:'Comment leur vendre'},
     langName:'French'
   },
   es: {
@@ -822,6 +819,9 @@ const translations = {
       {icon:'📚', title:'Tu historial se guarda', body:'Todo lo que has generado antes aparece en tu Historial — solo necesitas haber iniciado sesión.'},
       {icon:'⚙️', title:'Todo está aquí', body:'Toca el ícono ⚙️ arriba en cualquier momento para acceder rápidamente a todo en el sitio.'}
     ],
+        labelGoal:'Objetivo de marketing', goals:['Aumentar ventas','Reconocimiento de marca','Conseguir clics','Lanzar un producto','Generar confianza'], btnRegenerate:'Regenerar',
+    kitTabs:['Resumen','SEO','Descripción','Puntos de venta','Anuncios','TikTok','Audiencia'],
+    kl:{summary:'Resumen del producto', angle:'Ángulo de venta principal', forWho:'Pensado para', seoTitle:'Título SEO', meta:'Meta descripción', keyword:'Palabra clave principal', keywords:'Palabras clave', slug:'Slug de la URL', short:'Descripción corta', long:'Descripción larga', hook:'Gancho', video:'Idea de video', script:'Guion', onScreen:'Texto en pantalla', caption:'Pie de foto', cta:'Llamada a la acción', hashtags:'Hashtags', who:'Quiénes son', problems:'Problemas del cliente', motivation:'Motivación de compra', howToSell:'Cómo venderles'},
     langName:'Spanish'
   }
 };
@@ -885,6 +885,11 @@ function setLanguage(lang){
   catSel.innerHTML = t.categories.map((c,i)=>`<option value="${i}">${c}</option>`).join('');
   catSel.value = selectedCategoryIndex;
 
+  const goalSel = document.getElementById('pGoal');
+  const prevGoal = goalSel.value || '0';
+  goalSel.innerHTML = t.goals.map((g,i)=>`<option value="${i}">${g}</option>`).join('');
+  goalSel.value = prevGoal;
+
   if(selectedToneIndex >= t.tones.length) selectedToneIndex = 0;
   const toneGrid = document.getElementById('toneGrid');
   toneGrid.innerHTML = t.tones.map((tone,i)=>`<button type="button" class="tone-opt${i===selectedToneIndex?' active':''}" data-idx="${i}" onclick="pickTone(${i})">${tone}</button>`).join('');
@@ -901,6 +906,7 @@ function setLanguage(lang){
   updateAuthButton();
   updateFileLabel(document.getElementById('productPhoto'), 'productPhotoName');
   updateFileLabel(document.getElementById('photoOnlyInput'), 'photoOnlyInputName');
+  if(currentKit) renderKit();
 }
 function pickTone(idx){
   selectedToneIndex = idx;
@@ -937,11 +943,11 @@ function parseSections(text){
 
 let lastImagePrompt = '';
 
-async function callClaude(system, user){
+async function callClaude(system, user, json){
   const response = await fetch('/api/generate', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ system, user })
+    body: JSON.stringify({ system, user, json: !!json })
   });
   const data = await response.json();
   if(!response.ok){ throw new Error((data && data.error && data.error.message) || 'request failed'); }
@@ -958,15 +964,43 @@ function copyOut(elId, btnId){
   });
 }
 
+const FREE_TRY_LIMIT = 3;
+async function getUsageCount(){
+  if(!currentUser) return 0;
+  const { count, error } = await supabaseClient
+    .from('history')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', currentUser.id);
+  if(error){ console.error(error); return 0; }
+  return count || 0;
+}
+async function checkUsageAndAuth(errShowFn){
+  const t = translations[currentLang];
+  if(!currentUser){
+    openAuthModal();
+    errShowFn(t.authRequiredMsg);
+    return false;
+  }
+  const count = await getUsageCount();
+  if(count >= FREE_TRY_LIMIT){
+    errShowFn(t.usageLimitReached);
+    return false;
+  }
+  return true;
+}
+
 async function generateContent(){
   const t = translations[currentLang];
+  hideErr();
+  const allowed = await checkUsageAndAuth(showErr);
+  if(!allowed) return;
+
   const name = document.getElementById('pName').value.trim();
   const features = document.getElementById('pFeatures').value.trim();
   const audience = document.getElementById('pAudience').value.trim();
   const categoryText = t.categories[document.getElementById('pCategory').value];
   const toneText = t.tones[selectedToneIndex];
 
-  hideErr();
   if(!name || !features){ showErr(t.errMissing); return; }
 
   setLoading(true);
@@ -977,49 +1011,36 @@ async function generateContent(){
       ? 'Egyptian Arabic colloquial dialect (masri, everyday spoken Arabic as used in Egypt, NOT formal Modern Standard Arabic)'
       : t.langName;
 
-    const system = `You are an expert marketing copywriter specialized in e-commerce product content, writing entirely in ${langForPrompt}. Follow AIDA principles (Attention, Interest, Desire, Action) for ad copy.
+    const goalEn = goalsEn[parseInt(document.getElementById('pGoal').value, 10) || 0];
 
-Respond using EXACTLY this format, with no extra commentary before or after, and no Markdown symbols like asterisks:
+    const system = `You are a senior e-commerce marketing strategist and conversion copywriter. Write every text value in ${langForPrompt}, in the natural voice of native marketers of that market (never a literal translation). Keep product and brand names exactly as given.
 
-[SEO]
-(a 3-4 sentence SEO-friendly product description with natural keywords)
-[KEYWORDS]
-(5-8 short keywords separated by commas)
-[BULLETS]
-- selling point 1
-- selling point 2
-- selling point 3
-- selling point 4
-- selling point 5
-[FB]
-(a short-to-medium Facebook/Instagram ad paragraph following AIDA, ending with a clear call to action)
-[TIKTOK]
-(a very short, fast-paced TikTok ad script, max 3-4 short sentences)
-[IMAGE_PROMPT]
-(a concise, purely visual, physical description of the product itself in English ONLY, 1-2 sentences, mentioning size, type, shape, color, and material whenever that information is known from the input. Do not mention the brand name or any text. Always write this section in English regardless of the requested content language. Example: "a 43 inch flat screen smart TV with thin black bezels, mounted on a stand")
+FACT RULES (critical): use ONLY facts present in the product data. Never invent specifications, numbers, prices, discounts, warranties, certifications, awards, reviews or claims. If a detail is missing, write copy that does not depend on it. You may infer the likely audience and selling angles, but never state invented facts.
 
-IMPORTANT: Keep the section markers [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] [IMAGE_PROMPT] exactly as shown, in English. Write the content inside [SEO] [KEYWORDS] [BULLETS] [FB] [TIKTOK] entirely in ${langForPrompt}. Write the content inside [IMAGE_PROMPT] entirely in English, no matter what ${langForPrompt} is.`;
+Every ad follows: Hook, Problem, Solution, Benefits, Offer (only if provided), CTA. No repetition and no unsupported exaggeration. Tone: ${toneText}. Marketing goal: ${goalEn}.
 
-    const user = `Product name: ${name}\nCategory: ${categoryText}\nKey features: ${features}\nTarget audience: ${audience || 'general'}\nTone of voice: ${toneText}`;
+Return ONLY a valid JSON object, no markdown, in exactly this shape:
+{"overview":{"summary":"","angle":"","audience":""},"seo":{"title":"","meta":"max 155 characters","keyword":"","keywords":["5-8 items"],"slug":"latin-lowercase-slug"},"description":{"short":"1-2 sentences","long":"4-6 sentences"},"points":[{"t":"short title","b":"customer benefit"}],"ads":[{"label":"","hook":"","body":"","cta":""}],"tiktok":{"hook":"first 3 seconds","video":"what appears on screen","script":"voiceover","text":"on-screen text","caption":"","cta":"","tags":["5-8 hashtags"]},"audience":{"who":"","problems":"","motivation":"","howToSell":""},"imagePrompt":"English only, purely visual description of the product itself (shape, color, material), 1-2 sentences, no brand names or text"}
+Rules: "points" must contain 6 items. "ads" must contain exactly 5 items in this order, with labels translated: Direct Sales, Problem/Solution, Emotional, Premium, Short.`;
 
-    const raw = await callClaude(system, user);
-    const data = parseSections(raw);
+    const user = `Product name: ${name}\nCategory: ${categoryText}\nKnown product facts (the ONLY facts you may state): ${features}\nTarget audience: ${audience || 'not specified - infer the most likely audience'}`;
 
-    document.getElementById('seoOut').textContent = data.seoDescription || '';
-    document.getElementById('kwWrap').innerHTML = (data.keywords||[]).map(k=>`<span class="kw">${escapeHtml(k)}</span>`).join('');
-    document.getElementById('bulletsOut').innerHTML = (data.bulletPoints||[]).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
-    document.getElementById('bulletsPlainHidden').textContent = (data.bulletPoints||[]).map(b=>'• '+b).join('\n');
-    document.getElementById('fbOut').textContent = data.fbAd || '';
-    document.getElementById('tiktokOut').textContent = data.tiktokAd || '';
-    lastImagePrompt = data.imagePrompt || '';
+    const raw = await callClaude(system, user, true);
+    const kit = normalizeKit(parseKitJson(raw));
+    if(!kit.description.long && !kit.ads.length){ throw new Error('empty result'); }
+    currentKit = kit;
+    activeKitTab = 0;
+    renderKit();
+    lastImagePrompt = kit.imagePrompt || '';
 
     await saveHistoryEntry({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
       dateLabel: new Date().toLocaleDateString(currentLang==='ar' ? 'ar-EG' : undefined),
       name, categoryIndex: document.getElementById('pCategory').value, features, audience,
       toneIndex: selectedToneIndex,
-      seoDescription: data.seoDescription, keywords: data.keywords, bulletPoints: data.bulletPoints,
-      fbAd: data.fbAd, tiktokAd: data.tiktokAd, imagePrompt: data.imagePrompt
+      // The full kit is stored inside the existing jsonb "keywords" column, so no database change is needed.
+      seoDescription: kit.description.long, keywords: { kit }, bulletPoints: kit.points.map(p=>p.t),
+      fbAd: kitAdText(kit.ads[0]), tiktokAd: kit.tiktok.script, imagePrompt: kit.imagePrompt
     });
 
     document.getElementById('results').classList.add('show');
@@ -1344,13 +1365,11 @@ async function loadHistoryEntry(id){
   selectedToneIndex = item.toneIndex;
   pickTone(item.toneIndex);
 
-  document.getElementById('seoOut').textContent = item.seoDescription || '';
-  document.getElementById('kwWrap').innerHTML = (item.keywords||[]).map(k=>`<span class="kw">${escapeHtml(k)}</span>`).join('');
-  document.getElementById('bulletsOut').innerHTML = (item.bulletPoints||[]).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
-  document.getElementById('bulletsPlainHidden').textContent = (item.bulletPoints||[]).map(b=>'• '+b).join('\n');
-  document.getElementById('fbOut').textContent = item.fbAd || '';
-  document.getElementById('tiktokOut').textContent = item.tiktokAd || '';
-  lastImagePrompt = item.imagePrompt || '';
+  const stored = item.keywords;
+  currentKit = (stored && !Array.isArray(stored) && stored.kit) ? normalizeKit(stored.kit) : legacyToKit(item);
+  activeKitTab = 0;
+  renderKit();
+  lastImagePrompt = currentKit.imagePrompt || item.imagePrompt || '';
   document.getElementById('results').classList.add('show');
   document.getElementById('historyPanel').style.display = 'none';
   document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
@@ -1509,22 +1528,123 @@ function buildPrintBulletsSection(title, bulletsText){
   return `<div class="wpp-section"><h2>${escapePrintHtml(title)}</h2><ul>${items.map(i=>`<li>${escapePrintHtml(i)}</li>`).join('')}</ul></div>`;
 }
 
+const goalsEn = ['Increase sales','Brand awareness','Get clicks','Launch a product','Build trust'];
+let currentKit = null;
+let activeKitTab = 0;
+let kitCopyStore = [];
+
+function parseKitJson(raw){
+  const s = String(raw || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  try{ return JSON.parse(s); }catch(e){}
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  if(a >= 0 && b > a) return JSON.parse(s.slice(a, b + 1));
+  throw new Error('invalid response');
+}
+function normalizeKit(k){
+  k = k || {};
+  const S = v => (v == null) ? '' : String(v);
+  const A = v => Array.isArray(v) ? v : [];
+  const g = (o, key) => S(o && o[key]);
+  return {
+    overview: { summary: g(k.overview,'summary'), angle: g(k.overview,'angle'), audience: g(k.overview,'audience') },
+    seo: { title: g(k.seo,'title'), meta: g(k.seo,'meta'), keyword: g(k.seo,'keyword'), keywords: A(k.seo && k.seo.keywords).map(S), slug: g(k.seo,'slug') },
+    description: { short: g(k.description,'short'), long: g(k.description,'long') },
+    points: A(k.points).map(p => ({ t: g(p,'t'), b: g(p,'b') })),
+    ads: A(k.ads).map(a => ({ label: g(a,'label'), hook: g(a,'hook'), body: g(a,'body'), cta: g(a,'cta') })),
+    tiktok: { hook: g(k.tiktok,'hook'), video: g(k.tiktok,'video'), script: g(k.tiktok,'script'), text: g(k.tiktok,'text'), caption: g(k.tiktok,'caption'), cta: g(k.tiktok,'cta'), tags: A(k.tiktok && k.tiktok.tags).map(S) },
+    audience: { who: g(k.audience,'who'), problems: g(k.audience,'problems'), motivation: g(k.audience,'motivation'), howToSell: g(k.audience,'howToSell') },
+    imagePrompt: S(k.imagePrompt)
+  };
+}
+function legacyToKit(item){
+  return normalizeKit({
+    seo: { keywords: Array.isArray(item.keywords) ? item.keywords : [] },
+    description: { long: item.seoDescription || '' },
+    points: (item.bulletPoints || []).map(b => ({ t: '', b })),
+    ads: [{ label: '', body: item.fbAd || '' }],
+    tiktok: { script: item.tiktokAd || '' },
+    imagePrompt: item.imagePrompt || ''
+  });
+}
+function kitAdText(a){ return a ? [a.hook, a.body, a.cta].filter(Boolean).join('\n') : ''; }
+
+function kitBlock(label, text){
+  if(!text) return '';
+  const i = kitCopyStore.push(text) - 1;
+  const t = translations[currentLang];
+  return `<div class="out-card"><div class="out-head"><h3>${escapeHtml(label)}</h3><button type="button" class="btn-outline" onclick="copyKit(${i},this)">${escapeHtml(t.btnCopy)}</button></div><div class="out-body">${escapeHtml(text)}</div></div>`;
+}
+function kitPanels(kit){
+  const L = translations[currentLang].kl;
+  const B = kitBlock;
+  return [
+    B(L.summary, kit.overview.summary) + B(L.angle, kit.overview.angle) + B(L.forWho, kit.overview.audience),
+    B(L.seoTitle, kit.seo.title) + B(L.meta, kit.seo.meta) + B(L.keyword, kit.seo.keyword) + B(L.keywords, kit.seo.keywords.join(', ')) + B(L.slug, kit.seo.slug),
+    B(L.short, kit.description.short) + B(L.long, kit.description.long),
+    kit.points.map((p,i) => B(p.t || ('#' + (i+1)), p.b || p.t)).join(''),
+    kit.ads.map((a,i) => B(a.label || ('#' + (i+1)), kitAdText(a))).join(''),
+    B(L.hook, kit.tiktok.hook) + B(L.video, kit.tiktok.video) + B(L.script, kit.tiktok.script) + B(L.onScreen, kit.tiktok.text) + B(L.caption, kit.tiktok.caption) + B(L.cta, kit.tiktok.cta) + B(L.hashtags, kit.tiktok.tags.join(' ')),
+    B(L.who, kit.audience.who) + B(L.problems, kit.audience.problems) + B(L.motivation, kit.audience.motivation) + B(L.howToSell, kit.audience.howToSell)
+  ];
+}
+function renderKit(){
+  if(!currentKit) return;
+  const t = translations[currentLang];
+  kitCopyStore = [];
+  const panels = kitPanels(currentKit);
+  document.getElementById('kitTabs').innerHTML = t.kitTabs.map((n,i) => `<button type="button" class="tone-opt${i===activeKitTab?' active':''}" onclick="showKitTab(${i})">${escapeHtml(n)}</button>`).join('');
+  document.getElementById('kitPanels').innerHTML = panels.map((h,i) => `<div style="display:${i===activeKitTab?'block':'none'}">${h}</div>`).join('');
+  document.getElementById('results').classList.add('show');
+}
+function showKitTab(i){ activeKitTab = i; renderKit(); }
+function copyKit(i, btn){
+  navigator.clipboard.writeText(kitCopyStore[i] || '').then(() => {
+    const original = btn.textContent;
+    btn.textContent = translations[currentLang].btnCopied;
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+  });
+}
+function kitPlainText(kit){
+  if(!kit) return '';
+  return [kit.overview.summary, kit.description.long, kit.points.map(p => (p.t ? p.t + '. ' : '') + p.b).join('. '), kitAdText(kit.ads[0]), kit.tiktok.script].filter(Boolean).join('. ');
+}
+function kitPrintHtml(kit, name){
+  const L = translations[currentLang].kl;
+  const T = translations[currentLang].kitTabs;
+  const S = buildPrintSection;
+  let h = `<div class="wpp-header"><h1>${escapePrintHtml(name || 'Wassaf')}</h1></div>`;
+  h += S(L.summary, kit.overview.summary) + S(L.angle, kit.overview.angle) + S(L.forWho, kit.overview.audience);
+  h += S(L.seoTitle, kit.seo.title) + S(L.meta, kit.seo.meta) + S(L.keywords, kit.seo.keywords.join(', '));
+  h += S(L.short, kit.description.short) + S(L.long, kit.description.long);
+  h += buildPrintBulletsSection(T[3], kit.points.map(p => (p.t ? p.t + ': ' : '') + p.b).join('\n'));
+  h += kit.ads.map((a,i) => S(a.label || ('#' + (i+1)), kitAdText(a))).join('');
+  h += S('TikTok - ' + L.hook, kit.tiktok.hook) + S(L.video, kit.tiktok.video) + S(L.script, kit.tiktok.script) + S(L.onScreen, kit.tiktok.text) + S(L.caption, kit.tiktok.caption) + S(L.cta, kit.tiktok.cta) + S(L.hashtags, kit.tiktok.tags.join(' '));
+  h += S(L.who, kit.audience.who) + S(L.problems, kit.audience.problems) + S(L.motivation, kit.audience.motivation) + S(L.howToSell, kit.audience.howToSell);
+  return h;
+}
+
 function printResultsAsPDF(kind){
   const t = translations[currentLang];
   const name = kind === 'form'
     ? document.getElementById('pName').value.trim()
     : '';
 
-  const seo = document.getElementById(kind === 'form' ? 'seoOut' : 'photoSeoOut').textContent;
-  const bullets = document.getElementById(kind === 'form' ? 'bulletsPlainHidden' : 'photoBulletsPlainHidden').textContent;
-  const fb = document.getElementById(kind === 'form' ? 'fbOut' : 'photoFbOut').textContent;
-  const tiktok = document.getElementById(kind === 'form' ? 'tiktokOut' : 'photoTiktokOut').textContent;
-
-  let html = `<div class="wpp-header"><h1>${escapePrintHtml(name || 'Wassaf')}</h1></div>`;
-  html += buildPrintSection(t.outSeoTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), seo);
-  html += buildPrintBulletsSection(t.outBulletsTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), bullets);
-  html += buildPrintSection(t.outFbTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), fb);
-  html += buildPrintSection(t.outTiktokTitle.replace(/^[^\u0600-\u06FFA-Za-z]*/,''), tiktok);
+  let html;
+  if(kind === 'form' && currentKit){
+    html = kitPrintHtml(currentKit, name);
+  } else {
+    const seo = document.getElementById('photoSeoOut').textContent;
+    const bullets = document.getElementById('photoBulletsPlainHidden').textContent;
+    const fb = document.getElementById('photoFbOut').textContent;
+    const tiktok = document.getElementById('photoTiktokOut').textContent;
+    const strip = s => s.replace(/^[^\u0600-\u06FFA-Za-z]*/,'');
+    html = `<div class="wpp-header"><h1>${escapePrintHtml(name || 'Wassaf')}</h1></div>`;
+    html += buildPrintSection(strip(t.outSeoTitle), seo);
+    html += buildPrintBulletsSection(strip(t.outBulletsTitle), bullets);
+    html += buildPrintSection(strip(t.outFbTitle), fb);
+    html += buildPrintSection(strip(t.outTiktokTitle), tiktok);
+  }
 
   const area = document.createElement('div');
   area.id = 'wassafPrintArea';
@@ -1694,6 +1814,10 @@ async function analyzeFromPhoto(){
   const btnLabel = document.getElementById('analyzeBtnLabel');
   const t = translations[currentLang];
   errEl.style.display = 'none';
+
+  const showAnalyzeErr = (msg) => { errEl.textContent = msg; errEl.style.display = 'block'; };
+  const allowed = await checkUsageAndAuth(showAnalyzeErr);
+  if(!allowed) return;
 
   if(!file){
     errEl.textContent = t.analyzeErrNoFile;
